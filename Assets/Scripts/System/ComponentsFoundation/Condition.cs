@@ -2,13 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Condition : MonoBehaviour {
+public abstract class Condition : MonoBehaviour {
     public string conditionName;
 
-    public virtual ConditionState Check () { return default(ConditionState); }
+    public abstract ConditionState Check ();
 }
 
-public struct ConditionState {
+public class ConditionState {
     public bool isSatisfied;
     public Dictionary<string, object> args;
+    /*
+    public ConditionState () : this(false, new Dictionary<string, object>());
+
+    public ConditionState (bool _isSatistfried, Dictionary<string, object> _args)
+    {
+        this.isSatisfied = _isSatistfried;
+        this.args = _args;
+    }*/
+
+    public ConditionState()
+    {
+        this.isSatisfied = false;
+        this.args = new Dictionary<string, object>();
+    }
+
 }

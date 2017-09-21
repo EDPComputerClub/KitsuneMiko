@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Action : MonoBehaviour {
+public abstract class Action : MonoBehaviour {
     public string actionName;
 
-    public virtual bool IsDone() { return false; }
-    public virtual void Act (Dictionary<string, object> args) { return; }
+    public abstract bool IsDone();
+    public abstract void Act (Dictionary<string, object> args);
 }

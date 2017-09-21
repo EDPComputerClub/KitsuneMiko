@@ -7,10 +7,14 @@ public class Walkable : Condition {
     ConditionState Status;
 	public override ConditionState Check()
 	{
-        Debug.Log("CALLED");
         return Status;
     }
 	
+    void Start()
+    {
+        Status = new ConditionState();
+    }
+
 	// Update is called once per frame
 	void Update () {
         Status.isSatisfied = Input.GetKeyDown(KeyCode.RightArrow);

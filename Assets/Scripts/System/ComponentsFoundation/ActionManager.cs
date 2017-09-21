@@ -17,6 +17,11 @@ public class ActionManager : MonoBehaviour {
         foreach (ActionConfig action in actionConfigs) {
             action.Init(this);
         }
+        SortActions();
+        Debug.Log(orderedActions);
+        {
+            
+        }
     }
 
     // orderedActionsListの中身をaction.orderに従って並べ替える
@@ -135,6 +140,7 @@ public class ActionConfig {
     [System.Serializable]
     // Actionを実行するために必要な条件のデータを格納するクラス
     public class ConditionConfig {
+        
         // 条件の名前
         public string conditionName;
         // 条件の反転を行うかどうか
@@ -171,17 +177,17 @@ public class ActionConfig {
     [System.NonSerialized]
     public System.Type[] blockActionTypes;
 
-    protected Dictionary<string, object> args = new Dictionary<string, object>();
+    protected Dictionary<string, object> args;
 
     public ActionConfig (
             string actionName, int order, int weight,
             Dictionary<string, bool> conditions, string[] blockActions
         ) {
+        Debug.Log("actconfctor");
         this.actionName = actionName;
         this.order = order;
         this.weight = weight;
         this.blockActions = blockActions;
-
         int idx = 0;
         int len = conditions.Count;
         this.conditions = new ConditionConfig[len];
@@ -194,6 +200,7 @@ public class ActionConfig {
     public virtual void Init (ActionManager manager) {
         // ActionConfig.actionNameと名前が一致するActionコンポーネントをActionConfig.actionに代入
         action = manager.GetComponents<Action>().First(elm => elm.actionName == actionName);
+        this.args = new Dictionary<string, object>();
 
         // ConditionのInitialize
         foreach (ConditionConfig condition in conditions) {

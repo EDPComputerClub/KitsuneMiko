@@ -2316,9 +2316,7 @@ GameObject:
   - component: {fileID: 908368842}
   - component: {fileID: 908368836}
   - component: {fileID: 908368841}
-  - component: {fileID: 908368838}
   - component: {fileID: 908368837}
-  - component: {fileID: 908368840}
   - component: {fileID: 908368839}
   m_Layer: 0
   m_Name: Player
@@ -2350,18 +2348,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   conditionName: WalkCondition
---- !u!114 &908368838
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 908368835}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3556f8a992c9fb64f9828e9a4c514550, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  conditionName: WalkCondition
 --- !u!114 &908368839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2371,18 +2357,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f5fdfc8e677a48644826ae1e77543bbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  actionName: WalkRight
---- !u!114 &908368840
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 908368835}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c2767f1e1f381c4185829305cb3d442, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   actionName: WalkRight
@@ -2403,9 +2377,8 @@ MonoBehaviour:
     conditions:
     - conditionName: WalkCondition
       not: 0
-    weight: 0
-    blockActions:
-    - 
+    weight: 1
+    blockActions: []
 --- !u!95 &908368842
 Animator:
   serializedVersion: 3
