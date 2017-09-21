@@ -2318,6 +2318,8 @@ GameObject:
   - component: {fileID: 908368841}
   - component: {fileID: 908368838}
   - component: {fileID: 908368837}
+  - component: {fileID: 908368840}
+  - component: {fileID: 908368839}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -2347,7 +2349,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c339a695e39532642949625426e5d60d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  conditionName: 
+  conditionName: WalkCondition
 --- !u!114 &908368838
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2359,7 +2361,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cff0f1cfaa10014d89ec3ecd69ed40f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actionName: 
+  actionName: Walk
+  walkSpeed: 3
+--- !u!114 &908368839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 908368835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d24ecf3767d96cd469fb5646b0a1889a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  conditionName: JumpCondition
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 256
+--- !u!114 &908368840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 908368835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ebedf144e1fa3d4ea6eca2373863d91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionName: Jump
 --- !u!114 &908368841
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2376,6 +2406,13 @@ MonoBehaviour:
     order: 0
     conditions:
     - conditionName: WalkCondition
+      not: 0
+    weight: 1
+    blockActions: []
+  - actionName: Jump
+    order: 1
+    conditions:
+    - conditionName: JumpCondition
       not: 0
     weight: 1
     blockActions: []

@@ -95,21 +95,6 @@ public class PlayerManager : MonoBehaviour
     void Update()
     {
 
-        //押しているボタンで分岐
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            PushLeftButton();
-
-        }
-        else if (Input.GetKey(KeyCode.RightArrow))
-        {
-            PushRightButton();
-        }
-        else
-        {
-            ReleaseMoveButton();
-        }
-
         canJump =
             Physics2D.Linecast(transform.position - (transform.right * 0.3f),
             transform.position - (transform.up * 0.1f), blockLayer) ||
@@ -194,23 +179,6 @@ public class PlayerManager : MonoBehaviour
 
     void FixedUpdate()
     {
-
-        //moveDirectionの値によって速度を設定
-        switch (moveDirection)
-        {
-            case MOVE_DIR.STOP:
-                moveSpeed = 0;
-                break;
-            case MOVE_DIR.LEFT:
-                moveSpeed = MOVE_SPEED * -1;
-                transform.localScale = new Vector2(1, 1);
-                break;
-            case MOVE_DIR.RIGHT:
-                moveSpeed = MOVE_SPEED;
-                transform.localScale = new Vector2(-1, 1);
-                break;
-        }
-        rbody.velocity = new Vector2(moveSpeed, rbody.velocity.y);
 
         //通常では重力は2
         rbody.gravityScale = 2f;
