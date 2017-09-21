@@ -18,10 +18,6 @@ public class ActionManager : MonoBehaviour {
             action.Init(this);
         }
         SortActions();
-        Debug.Log(orderedActions);
-        {
-            
-        }
     }
 
     // orderedActionsListの中身をaction.orderに従って並べ替える
@@ -116,7 +112,6 @@ public class ActionManager : MonoBehaviour {
 
     protected virtual void FixedUpdate () {
         UpdateBlock();
-        //Debug.Log(orderedActions.Count);
         foreach (List<ActionConfig> actions in orderedActions.Values) {
             List<ActionConfig> availableActions = RemoveNeedless(actions);
             // 実行可能なActionの数で条件分けを行う
@@ -183,7 +178,6 @@ public class ActionConfig {
             string actionName, int order, int weight,
             Dictionary<string, bool> conditions, string[] blockActions
         ) {
-        Debug.Log("actconfctor");
         this.actionName = actionName;
         this.order = order;
         this.weight = weight;
