@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 public class ActionManager : MonoBehaviour {
+    // 登録するActionのセッティングデータを格納する配列
     public List<ActionConfig> actionConfigs;
 
     protected List<ActionConfig> doingActions = new List<ActionConfig>();
@@ -11,12 +12,14 @@ public class ActionManager : MonoBehaviour {
     protected SortedDictionary<int, List<ActionConfig>> orderedActions
         = new SortedDictionary<int, List<ActionConfig>>();
 
+    // ActionConfigとConditionConfigの初期化
     protected virtual void Start () {
         foreach (ActionConfig action in actionConfigs) {
             action.Init(this);
         }
     }
 
+    // orderedActionsListの中身をaction.orderに従って並べ替える
     protected virtual void SortActions () {
         orderedActions.Clear();
         foreach (ActionConfig action in actionConfigs) {
@@ -42,12 +45,18 @@ public class ActionManager : MonoBehaviour {
         SortActions();
     }
 
+    // 実行可能なactionsのみ取り出す
     protected virtual List<ActionConfig> RemoveNeedless (List<ActionConfig> actions) {
+        // 新しいGeneric Collection Listを宣言
         List<ActionConfig> availableActions = new List<ActionConfig>();
+        //与えられたActionConfigsの中からひとつActionConfigを取り出し、
         foreach (ActionConfig action in actions) {
+            // ActionConfigの中のActionの型を取得してactionTypeに代入
             System.Type actionType = action.action.GetType();
-            if (!blockActionTypes.Any(
-                    type => actionType == type || actionType.IsSubclassOf(type))
+
+            // blockActionTypesの中に、actionTypeと同じ型またはその派生型であり、ActionConfig.actionが実行可能であれば、
+            // availableActionsListの中にそのactionを追加する
+            if (!blockActionTypes.Any(type => actionType == type || actionType.IsSubclassOf(type))
                 && action.IsAvailable()
             ) {
                 availableActions.Add(action);
@@ -56,12 +65,16 @@ public class ActionManager : MonoBehaviour {
         return availableActions;
     }
 
+    // 重み付き確率により実行するActionをランダムに決める
     protected virtual ActionConfig SelectRandom (List<ActionConfig> actions) {
+        // selectedActionにactionsの最後のアイテムを代入
         ActionConfig selectedAction = actions[actions.Count - 1];
+
         int totalWeight = 0;
         foreach (ActionConfig action in actions) {
             totalWeight += action.weight;
         }
+
         float rnd = Random.value * totalWeight;
         foreach (ActionConfig action in actions) {
             rnd -= action.weight;
@@ -72,6 +85,7 @@ public class ActionManager : MonoBehaviour {
         return selectedAction;
     }
 
+    // actionを実行する
     protected virtual void DoAction (ActionConfig action) {
         action.Act();
         if (!doingActions.Contains(action)) {
@@ -80,8 +94,12 @@ public class ActionManager : MonoBehaviour {
         }
     }
 
+    // blockActionTypesからIsDone() = true : 処理が終わっているActionを消す
     protected virtual void UpdateBlock () {
+        // blockActionTypesの初期化
         blockActionTypes.Clear();
+        // doingActionsの中身からIsDone()の返り値としてtrueが返ってきたものをRemove
+        // doingActionsの中身からIsDone()の返り値としてfalseが返ってきたものをblockActionTypesに追加
         for (int i = doingActions.Count - 1; i >= 0; i--) {
             if (doingActions[i].action.IsDone()) {
                 doingActions.RemoveAt(i);
@@ -93,8 +111,10 @@ public class ActionManager : MonoBehaviour {
 
     protected virtual void FixedUpdate () {
         UpdateBlock();
+        //Debug.Log(orderedActions.Count);
         foreach (List<ActionConfig> actions in orderedActions.Values) {
             List<ActionConfig> availableActions = RemoveNeedless(actions);
+            // 実行可能なActionの数で条件分けを行う
             switch (availableActions.Count) {
                 case 0:
                     break;
@@ -110,11 +130,15 @@ public class ActionManager : MonoBehaviour {
 }
 
 [System.Serializable]
+// 登録するActionのデータを格納するクラス
 public class ActionConfig {
     [System.Serializable]
+    // Actionを実行するために必要な条件のデータを格納するクラス
     public class ConditionConfig {
-        public bool not = false;
+        // 条件の名前
         public string conditionName;
+        // 条件の反転を行うかどうか
+        public bool not = false;
 
         [System.NonSerialized]
         public Condition condition;
@@ -125,15 +149,21 @@ public class ActionConfig {
         }
 
         public virtual void Init (ActionManager manager) {
+            // ActionConfig.conditionNameと名前が一致するConditionコンポーネントをActionConfig.conditionに代入
             condition = manager.GetComponents<Condition>().First(
                 elm => elm.conditionName == conditionName);
         }
     }
 
+    // Actionの名前
     public string actionName;
+    // 実行するActionの優先順位. 昇順.
     public int order = 1;
+    // Actionを実行するのに必要な条件を格納する配列
     public ConditionConfig[] conditions;
+    // 重み付き確率を行うための重みの設定
     public int weight = 1;
+    // Actionを行うにあたっての実行をブロックする他のActionsの型名:string
     public string[] blockActions;
 
     [System.NonSerialized]
@@ -162,29 +192,39 @@ public class ActionConfig {
     }
 
     public virtual void Init (ActionManager manager) {
-        action = manager.GetComponents<Action>().First(
-            elm => elm.actionName == actionName);
+        // ActionConfig.actionNameと名前が一致するActionコンポーネントをActionConfig.actionに代入
+        action = manager.GetComponents<Action>().First(elm => elm.actionName == actionName);
 
+        // ConditionのInitialize
         foreach (ConditionConfig condition in conditions) {
             condition.Init(manager);
         }
 
+        // blockActions(ブロックするActionのリスト):string[]の要素数を取得
         int len = blockActions.Length;
         blockActionTypes = new System.Type[len];
         for (int i = 0; i < len; i++) {
+            // string型からType型を取得してblockActionTypesに代入
             blockActionTypes[i] = System.Type.GetType(blockActions[i]);
         }
     }
 
     public virtual bool IsAvailable () {
         args.Clear();
+        // データ格納用structureの宣言
         ConditionState state;
+        // conditionsに入っているconditionをひとつずつ取り出す
         foreach (ConditionConfig condition in conditions) {
+            // conditionの中に入っているCheckメソッドを呼び出してConditionState.stateに代入する
             state = condition.condition.Check();
+            // condition.notでConditionのReverseを行う
             if (condition.not ? state.isSatisfied : !state.isSatisfied) {
+                // ひとつでもcondition.isSatisfiedを満たしていなければreturn false
                 return false;
             }
-            args = args.Union(state.args).ToDictionary(elm => elm.Key, elm => elm.Value);
+            // ActionConfig.args に ConditionState.args の代入を行う
+            args = args.Union(state.args)
+                        .ToDictionary(elm => elm.Key, elm => elm.Value);
         }
         return true;
     }

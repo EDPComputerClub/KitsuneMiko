@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Condition : MonoBehaviour {
+public class Condition : MonoBehaviour {
     public string conditionName;
 
-    public abstract ConditionState Check ();
+    public virtual ConditionState Check () { return default(ConditionState); }
 }
 
 public struct ConditionState {
