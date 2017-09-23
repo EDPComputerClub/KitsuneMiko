@@ -16,16 +16,17 @@ public class PlayerGroundCollisionDetector : Condition {
     void Start()
     {
         Status = new ConditionState();
+        Status.args.Add("onGround", false);
+        Status.isSatisfied = true;
     }
 
 	// Update is called once per frame
 	void Update () {
-		bool isOnGround =
+		bool onGround =
             Physics2D.Linecast(transform.position - (transform.right * 0.3f),
             transform.position - (transform.up * 0.1f), groundLayer) ||
             Physics2D.Linecast(transform.position + (transform.right * 0.3f),
             transform.position - (transform.up * 0.1f), groundLayer);
-
-        Status.isSatisfied = isOnGround;
+        Status.args["onGround"] = onGround;
     }
 }

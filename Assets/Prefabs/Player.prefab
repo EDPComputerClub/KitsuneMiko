@@ -23,8 +23,15 @@ GameObject:
   - component: {fileID: 50560526326773148}
   - component: {fileID: 61398285486344638}
   - component: {fileID: 58184078208563500}
-  - component: {fileID: 114874694715177476}
   - component: {fileID: 95613842310621774}
+  - component: {fileID: 114228410771386852}
+  - component: {fileID: 114874694715177476}
+  - component: {fileID: 114414694166727556}
+  - component: {fileID: 114744887314565410}
+  - component: {fileID: 114608208368860824}
+  - component: {fileID: 114226145518535580}
+  - component: {fileID: 114137117546123960}
+  - component: {fileID: 114009091673647524}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -39,7 +46,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1196683616667812}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6, y: 0, z: 0}
+  m_LocalPosition: {x: -5.7333, y: -1.6, z: 0}
   m_LocalScale: {x: -1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -122,13 +129,118 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &114874694715177476
+--- !u!114 &114009091673647524
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1196683616667812}
   m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1ea397375e717c4895a395ef53568e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  conditionName: JumpKeyCondition
+--- !u!114 &114137117546123960
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1196683616667812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c339a695e39532642949625426e5d60d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  conditionName: WalkCondition
+--- !u!114 &114226145518535580
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1196683616667812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cff0f1cfaa10014d89ec3ecd69ed40f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionName: Walk
+  walkSpeed: 3
+--- !u!114 &114228410771386852
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1196683616667812}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58f93a60e6c880a40b998655e5496ea7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &114414694166727556
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1196683616667812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4313761d5f9f514d92e17c8e40ea60e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionConfigs:
+  - actionName: Walk
+    order: 0
+    conditions:
+    - conditionName: WalkCondition
+      not: 0
+    weight: 1
+    blockActions: []
+  - actionName: Jump
+    order: 1
+    conditions:
+    - conditionName: JumpCondition
+      not: 0
+    - conditionName: JumpKeyCondition
+      not: 0
+    weight: 1
+    blockActions: []
+--- !u!114 &114608208368860824
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1196683616667812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d24ecf3767d96cd469fb5646b0a1889a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  conditionName: JumpCondition
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 256
+--- !u!114 &114744887314565410
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1196683616667812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ebedf144e1fa3d4ea6eca2373863d91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionName: Jump
+  jumpForce: 400
+  fallEnhance: 20
+--- !u!114 &114874694715177476
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1196683616667812}
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8cad332c6f80e08478d7dc771528a616, type: 3}
   m_Name: 

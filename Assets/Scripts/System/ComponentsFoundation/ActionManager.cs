@@ -206,7 +206,8 @@ public class ActionConfig {
         blockActionTypes = new System.Type[len];
         for (int i = 0; i < len; i++) {
             // string型からType型を取得してblockActionTypesに代入
-            blockActionTypes[i] = System.Type.GetType(blockActions[i]);
+            var blockedAction = manager.GetComponents<Action>().First(elm => elm.actionName == blockActions[i]).GetType();
+            blockActionTypes[i] = blockedAction;
         }
     }
 
