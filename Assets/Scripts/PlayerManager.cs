@@ -103,15 +103,7 @@ public class PlayerManager : MonoBehaviour
 
         animator.SetBool("onGround", canJump);
         //ストップしているかどうか（アニメーションに影響）
-        if (moveDirection == MOVE_DIR.STOP)
-        {
-            stop = true;
-
-        }
-        else
-        {
-            stop = false;
-        }
+        stop = moveDirection == MOVE_DIR.STOP;
         animator.SetBool("stop", stop);
 
         //ジャンプできる場合は常にstateJumpを0にセット
@@ -183,6 +175,7 @@ public class PlayerManager : MonoBehaviour
         //通常では重力は2
         rbody.gravityScale = 2f;
 
+        // Spaceキーが押されている間だけjumpCountをフレーム数だけ増やす
         if (Input.GetKey(KeyCode.Space))
         {
             jumpCount++;
