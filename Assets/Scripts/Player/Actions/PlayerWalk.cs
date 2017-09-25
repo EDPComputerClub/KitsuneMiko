@@ -35,11 +35,4 @@ public class PlayerWalk : Action {
         }
         rbody.velocity = new Vector2(moveSpeed, rbody.velocity.y);
     }
-
-	/// <summary>
-	/// Update is called every frame, if the MonoBehaviour is enabled.
-	/// </summary>
-	void Update()
-	{
-    }
 }

@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public class Timer : MonoBehaviour
 {
+    public string timerName;
 
     private float integratedTime;
     private uint integratedFrames;

@@ -3,7 +3,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 public class EnemyManager : MonoBehaviour {
-    private const int ENEMY_POINT = 50;//敵の得点
+
+    public enum ClassifiedName
+    {
+        Turtle = 0
+    }
+    public ClassifiedName classifiedName = (ClassifiedName)0;
+
+    public int HitPoints = 50;
+    public int HP
+    {
+        get
+        {
+            return this.HitPoints;
+        }
+        set
+        {
+            this.HitPoints = value;
+            if (HitPoints <= 0)
+            {
+                DestroyEnemy();
+            }
+        }
+    }
+    public int ENEMY_POINT
+    {
+        get
+        {
+            return 50;
+        }
+    }
     private GameObject gameManager;//ゲームマネージャー
 
     public LayerMask blockLayer;

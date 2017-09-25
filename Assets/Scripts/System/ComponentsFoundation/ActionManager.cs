@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+
 public class ActionManager : MonoBehaviour {
     // 登録するActionのセッティングデータを格納する配列
     public List<ActionConfig> actionConfigs;
@@ -173,6 +174,8 @@ public class ActionConfig {
     public System.Type[] blockActionTypes;
 
     protected Dictionary<string, object> args;
+    // 以下は出来ない.
+    //public Dictionary<string, object> args = new Dictionary<string, object>();
 
     public ActionConfig (
             string actionName, int order, int weight,
@@ -195,7 +198,6 @@ public class ActionConfig {
         // ActionConfig.actionNameと名前が一致するActionコンポーネントをActionConfig.actionに代入
         action = manager.GetComponents<Action>().First(elm => elm.actionName == actionName);
         this.args = new Dictionary<string, object>();
-
         // ConditionのInitialize
         foreach (ConditionConfig condition in conditions) {
             condition.Init(manager);
@@ -206,8 +208,7 @@ public class ActionConfig {
         blockActionTypes = new System.Type[len];
         for (int i = 0; i < len; i++) {
             // string型からType型を取得してblockActionTypesに代入
-            var blockedAction = manager.GetComponents<Action>().First(elm => elm.actionName == blockActions[i]).GetType();
-            blockActionTypes[i] = blockedAction;
+            blockActionTypes[i] = System.Type.GetType(blockActions[i]);
         }
     }
 

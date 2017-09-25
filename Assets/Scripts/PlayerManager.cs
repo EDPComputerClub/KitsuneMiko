@@ -2,9 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System.Linq;
 
 public class PlayerManager : MonoBehaviour
 {
+    GameObject presentWeapon;
+    public GameObject purificationStick;
+
+    public GameObject captureBox;
+
     public GameObject gameManager;
 
     public LayerMask blockLayer;//ブロックレイヤー
@@ -13,43 +19,6 @@ public class PlayerManager : MonoBehaviour
 
     private const float MOVE_SPEED = 3;//移動速度固定値
     private float moveSpeed;//移動速度
-
-    private float jumpPowerTime = 0;//分岐時に使用するジャンプ力時間
-    private float tmpJumpPowerTime = 0;//加算中のジャンプ力時間
-    private float jumpPower = 400;//ジャンプ力
-    private bool goJump = false;//ジャンプしたか否か
-    private bool canJump = false;//ブロックに設置しているか否か
-    private int stateJump = 0;
-    //0.ジャンプしてない
-    //1.ジャンプした瞬間
-    //2.ジャンプ中かつジャンプボタンを押したまま
-    //3.ジャンプ中かつジャンプボタンを離した
-    private int jumpCount = 0;//ジャンプボタンを押下したときに増加するカウント（stateJumpと連動）
-
-    private bool onAttackKey = false;//攻撃キーを押したか否か
-    private int stateAttack = 0;
-    //0.攻撃のキー受付状態
-    //1.攻撃キーを押した瞬間
-    //2.初撃時間中に攻撃キーを離した
-    //3.2番目の攻撃時間中に攻撃キーをまだ押していない
-    //4.2番目の攻撃時間中に攻撃キーを押した瞬間
-    //5.2番目の攻撃時間中に攻撃キーを離した
-    //6.3番目の攻撃時間中に攻撃キーをまだ押していない
-    //7.3番目の攻撃時間中に攻撃キーを押した瞬間
-    //8.3番目の攻撃時間中に攻撃キーを離した
-    //何もしない
-    private int attackCount = 0;//最初の攻撃キーを押してから最後の攻撃の終了まで増加する
-    private bool onAttackCount;//攻撃カウント中か否か
-
-    private int attackNum = 0;//現在の攻撃回数
-    private const int ATTACK_NUM_MAX = 3;//攻撃回数の上限値
-
-    private int stateCKey = 0;
-    //0.Cキーが押されていない
-    //1.Cキーが押された瞬間
-    //2.Cキーが放された
-
-    private bool stop = false;//ストップしているかどうか
     private Animator animator;  //アニメーター
     public enum MOVE_DIR
     {
@@ -57,10 +26,6 @@ public class PlayerManager : MonoBehaviour
         LEFT,
         RIGHT,
     };
-
-    private MOVE_DIR moveDirection = MOVE_DIR.STOP;
-
-
     public AudioClip jumpSE;
     public AudioClip getSE;
     public AudioClip stampSE;
@@ -69,10 +34,10 @@ public class PlayerManager : MonoBehaviour
 
     private GameObject touchedOrb;  // 最後に触ったオーブ 初期値は null
 
-    // timer that holds animation playtime
-    private Timer timer;
+    // Timer that holds animation playtime
+    private Timer animationProcessedTimer;
     // flag that enables player to input attack key
-    private bool isAttackKeyReceiving = true;
+    private bool isAttackKeyReceived = true;
     // if next attack is registered or not
     private bool isNextAttackRegistered = false;
     // counts of finished animations
@@ -90,63 +55,57 @@ public class PlayerManager : MonoBehaviour
         audioSource = gameManager.GetComponent<AudioSource>();
         rbody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        timer = gameObject.GetComponent<Timer>();
+        animationProcessedTimer = gameObject.GetComponents<Timer>().First(x => x.timerName == "animation");
+        presentWeapon = purificationStick;
+        chargingTimer = gameObject.GetComponents<Timer>().First(x => x.timerName == "charging");
+        captureBox.SetActive(false);
     }
     void Update()
     {
+        Attack(Input.GetKeyDown(KeyCode.C));
 
-        canJump =
-            Physics2D.Linecast(transform.position - (transform.right * 0.3f),
-            transform.position - (transform.up * 0.1f), blockLayer) ||
-            Physics2D.Linecast(transform.position + (transform.right * 0.3f),
-            transform.position - (transform.up * 0.1f), blockLayer);
+        Charge(Input.GetKeyDown(KeyCode.C), Input.GetKey(KeyCode.C), Input.GetKeyUp(KeyCode.C));
+    }
 
-        animator.SetBool("onGround", canJump);
-        //ストップしているかどうか（アニメーションに影響）
-        stop = moveDirection == MOVE_DIR.STOP;
-        animator.SetBool("stop", stop);
-
-        //ジャンプできる場合は常にstateJumpを0にセット
-        if (canJump)
-        {
-            stateJump = 0;
-        }
-
-        bool isAttackKeyPressed = isAttackKeyReceiving ? Input.GetKeyDown(KeyCode.C) : false;
+    void Attack(bool isAttackKeyPressed)
+    {
+        bool _isAttackKeyPressed = isAttackKeyReceived ? isAttackKeyPressed : false;
 
         // Attack Registration
-        if (isAttackKeyPressed && !isNextAttackRegistered)
+        if (_isAttackKeyPressed && !isNextAttackRegistered)
         {
             // 1st attack registration and implementation
             if (finishedAttackNum == (int)AttackNumber.Idle && nextAttackNum == (int)AttackNumber.First)
             {
                 animator.SetTrigger("attack");
-                timer.Begin();
+                presentWeapon.SetActive(true);
+                animationProcessedTimer.Begin();
                 nextAttackNum = (int)AttackNumber.Second;
                 Debug.Log("1 attack animation implemented");
             }
             // 2nd to 4th attack registration
             else if ((int)AttackNumber.Second <= nextAttackNum && nextAttackNum <= (int)AttackNumber.Fourth)
             {
-                if (timer.ElapsedTime * 12f < AttackAnimationDuration[nextAttackNum - 2])
+                if (animationProcessedTimer.ElapsedTime * 12f < AttackAnimationDuration[nextAttackNum - 2])
                 {
-                    isAttackKeyReceiving = false;
+                    isAttackKeyReceived = false;
                     isNextAttackRegistered = true;
                 }
             }
         }
 
         // Attack Implementation
-        if (1 < nextAttackNum && nextAttackNum < 5 && timer.ElapsedTime * 12f > AttackAnimationDuration[nextAttackNum - 2])
+        if (1 < nextAttackNum && nextAttackNum < 5 && animationProcessedTimer.ElapsedTime * 12f > AttackAnimationDuration[nextAttackNum - 2])
         {
             if (isNextAttackRegistered)
             {
                 // implement next attack if next attack was already registered
                 finishedAttackNum += 1;
                 nextAttackNum += 1;
-                timer.Begin();
+                animationProcessedTimer.Begin();
+                presentWeapon.SetActive(true);
                 animator.SetTrigger("attack");
-                isAttackKeyReceiving = true;
+                isAttackKeyReceived = true;
                 isNextAttackRegistered = false;
                 Debug.Log((finishedAttackNum + 1) + " attack animation implemented");
             }
@@ -154,72 +113,85 @@ public class PlayerManager : MonoBehaviour
             {
                 // implement sleep procedure to set up some settings
                 nextAttackNum = (int)AttackNumber.Reset;
-                timer.Begin();
-                isAttackKeyReceiving = false;
+                animationProcessedTimer.Begin();
+                presentWeapon.SetActive(false);
+                isAttackKeyReceived = false;
                 isNextAttackRegistered = false;
             }
         }
 
         //when fourth attack animation finished
-        if (nextAttackNum == (int)AttackNumber.Reset && timer.ElapsedTime * 12f > 6f * 1.5f)
+        if (nextAttackNum == (int)AttackNumber.Reset && animationProcessedTimer.ElapsedTime * 12f > 6f * 1.5f)
         {
-            isAttackKeyReceiving = true;
-            finishedAttackNum = 0;
-            nextAttackNum = 1;
+            presentWeapon.SetActive(false);
+            isAttackKeyReceived = true;
+            finishedAttackNum = (int)AttackNumber.Idle;
+            nextAttackNum = (int)AttackNumber.First;
         }
     }
 
-    void FixedUpdate()
+    // TODO : This method needs to be tidied up
+    // TODO : Fix the problem that player charged once and
+        // after that she cannot start charging after the next attack
+    bool isPreparingForCharging = false;
+    bool isCharging = false;
+    Timer chargingTimer;
+    float chargingTime = 1f;
+    bool isCapturing = false;
+    void Charge(bool isChargeButtonPressedOn, bool isChargeButtonKeptPressed, bool isChargeButtonPressedUp)
     {
-
-        //通常では重力は2
-        rbody.gravityScale = 2f;
-
-        // Spaceキーが押されている間だけjumpCountをフレーム数だけ増やす
-        if (Input.GetKey(KeyCode.Space))
+        if (isChargeButtonPressedOn && !isCharging)
         {
-            jumpCount++;
+            chargingTimer.Begin();
+            isPreparingForCharging = true;
         }
-        else
+
+        if (chargingTimer.ElapsedTime < chargingTime)
         {
-            jumpCount = 0;
-        }
-        //ジャンプボタンを押したときの処理
-        if (stateJump == 0)
-        {
-            if (jumpCount == 1)
+            if (isPreparingForCharging && isChargeButtonPressedUp)
             {
-                stateJump = 1;
+                isPreparingForCharging = false;
+                chargingTimer.Stop();
             }
         }
-        else if (stateJump == 2 && jumpCount > 1)
+
+        if(isPreparingForCharging && isChargeButtonKeptPressed && chargingTimer.ElapsedTime > chargingTime)
         {
-            //空中にいて
-            //スペースキーを押しているときは何もしない
-            stateJump = 3;
+            isCharging = true;
+            isPreparingForCharging = false;
+            chargingTimer.Begin(true);
         }
-        else if (stateJump == 3 && jumpCount == 0 && rbody.velocity.y > 0)
+
+        if (isCharging && isChargeButtonKeptPressed)
         {
-            //空中にいて
-            //スペースキーを離したときは
-            rbody.gravityScale = 5.0f;
+            Debug.Log(chargingTimer.ElapsedTime);
         }
-        else
+        else if (isCharging && isChargeButtonPressedUp && chargingTimer.ElapsedTime > 1f)
         {
-            //何もしない
+            Debug.Log("Attempting to capture");
+            isCapturing = true;
+            chargingTimer.Begin(true);
+            captureBox.SetActive(true);
         }
-        //ジャンプ処理
-        if (stateJump == 1)
+
+        if (isCapturing && chargingTimer.ElapsedTime > 0.8f)
         {
-            audioSource.PlayOneShot(jumpSE);
-            rbody.AddForce(Vector2.up * jumpPower);
-            stateJump = 2;
+            isCapturing = false;
+            chargingTimer.Stop();
+            captureBox.SetActive(false);
+        }
+
+        if (isCharging && !isChargeButtonKeptPressed)
+        {
+            isCharging = false;
+            chargingTimer.Stop();
         }
     }
 
     //衝突処理
     void OnTriggerEnter2D(Collider2D col)
     {
+        
         if (gameManager.GetComponent<GameManager>().gameMode != GameManager.GAME_MODE.PLAY)
         {
             return;
@@ -240,7 +212,7 @@ public class PlayerManager : MonoBehaviour
             {
                 audioSource.PlayOneShot(stampSE);
                 rbody.velocity = new Vector2(rbody.velocity.x, 0);
-                rbody.AddForce(Vector2.up * jumpPower);
+                rbody.AddForce(Vector2.up * 100f);
                 col.gameObject.GetComponent<EnemyManager>().DestroyEnemy();
             }
             else
@@ -276,44 +248,6 @@ public class PlayerManager : MonoBehaviour
         animSet.Append(transform.DOLocalMoveY(1.0f, 0.2f).SetRelative());
         animSet.Append(transform.DOLocalMoveY(-10.0f, 1.0f).SetRelative());
         Destroy(this.gameObject, 1.2f);
-    }
-
-    public void PushLeftButton()
-    {
-        moveDirection = MOVE_DIR.LEFT;
-    }
-
-    public void PushRightButton()
-    {
-        moveDirection = MOVE_DIR.RIGHT;
-    }
-
-    public void ReleaseMoveButton()
-    {
-        moveDirection = MOVE_DIR.STOP;
-
-    }
-    public void PushJumpButton()
-    {
-        if (canJump)
-        {
-            goJump = true;
-
-        }
-    }
-
-    void HitSpaceTime()
-    {
-
-        if (Input.GetKey(KeyCode.Space))
-        {
-            tmpJumpPowerTime += Time.deltaTime;
-        }
-        else
-        {
-            jumpPowerTime = tmpJumpPowerTime;
-        }
-        //ジャンプした現在のフレーム時にjumpPowerTimeとtmpJumpPowerTimeは初期化する
     }
 
 }
