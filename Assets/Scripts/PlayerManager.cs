@@ -130,66 +130,61 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    // TODO : This method needs to be tidied up
-    // TODO : Fix the problem that player charged once and
-        // after that she cannot start charging after the next attack
-    bool isPreparingForCharging = false;
-    bool isCharging = false;
-    bool isCapturing = false;
+    enum ChargeStatus : int
+    {
+        Idle = 0,
+        Preparing,
+        Charging,
+        Capturing
+    }
+    ChargeStatus chargeStatus = ChargeStatus.Idle;
     Timer chargingTimer;
     public float chargingPreparationTime = 1f;
     public float chargingTime = 1f;
+    public float animationDuration = 0.8f;
     void Charge(bool isChargeButtonKeptPressed)
     {
-        // チャージの開始準備期間のトリガー発火
-        if (isChargeButtonKeptPressed && !isPreparingForCharging && !isCharging)
+        if (isChargeButtonKeptPressed && chargeStatus == ChargeStatus.Idle)
         {
             chargingTimer.Begin();
-            isPreparingForCharging = true;
+            chargeStatus = ChargeStatus.Preparing;
+        }
+        else if (chargeStatus == ChargeStatus.Preparing)
+        {
+            if (isChargeButtonKeptPressed && chargingTimer.ElapsedTime >= chargingPreparationTime)
+            {
+                chargingTimer.Begin(true);
+                chargeStatus = ChargeStatus.Charging;
+            }
+            else if (!isChargeButtonKeptPressed && chargingTimer.ElapsedTime < chargingPreparationTime)
+            {
+                chargingTimer.Stop();
+                chargeStatus = ChargeStatus.Idle;
+            }
+        }
+        else if (chargeStatus == ChargeStatus.Charging)
+        {
+            Debug.Log("Charging -- " + chargingTimer.ElapsedTime + "s");
+            if (!isChargeButtonKeptPressed && chargingTimer.ElapsedTime >= chargingTime)
+            {
+                Debug.Log("Attempt to capture");
+                captureBox.SetActive(true);
+                chargingTimer.Begin(true);
+                chargeStatus = ChargeStatus.Capturing;
+
+            }
+            else if (!isChargeButtonKeptPressed && chargingTimer.ElapsedTime < chargingTime)
+            {
+                chargingTimer.Stop();
+                chargeStatus = ChargeStatus.Idle;
+            }
         }
 
-        // チャージ開始までにキーを離した時にリセット
-        if (chargingTimer.ElapsedTime < chargingTime && isPreparingForCharging && !isChargeButtonKeptPressed)
+        if (chargeStatus == ChargeStatus.Capturing && chargingTimer.ElapsedTime > animationDuration)
         {
-            isPreparingForCharging = false;
-            chargingTimer.Stop();
-        }
-
-        // チャージ開始
-        if (isPreparingForCharging && isChargeButtonKeptPressed && chargingTimer.ElapsedTime > chargingPreparationTime)
-        {
-            isCharging = true;
-            isPreparingForCharging = false;
-            chargingTimer.Begin(true);
-        }
-
-        // チャージしているならカウントアップ
-        if (isCharging && isChargeButtonKeptPressed)
-        {
-            Debug.Log(chargingTimer.ElapsedTime);
-        }
-        // 十分チャージしてるならチャージの試行を行う
-        else if (isCharging && !isChargeButtonKeptPressed && chargingTimer.ElapsedTime > chargingTime)
-        {
-            Debug.Log("Attempting to capture");
-            isCapturing = true;
-            chargingTimer.Begin(true);
-            captureBox.SetActive(true);
-        }
-
-        // キャプチャーアニメーション終了後の処理
-        if (isCapturing && chargingTimer.ElapsedTime > 0.8f)
-        {
-            isCapturing = false;
-            chargingTimer.Stop();
             captureBox.SetActive(false);
-        }
-
-        // チャージ中にボタンを離されたらリセット
-        if (isCharging && !isChargeButtonKeptPressed)
-        {
-            isCharging = false;
             chargingTimer.Stop();
+            chargeStatus = ChargeStatus.Idle;
         }
     }
 
