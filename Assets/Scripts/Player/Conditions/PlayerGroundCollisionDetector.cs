@@ -7,12 +7,12 @@ public class PlayerGroundCollisionDetector : Condition {
     public LayerMask groundLayer;
 
     ConditionState Status;
-	public override ConditionState Check()
-	{
+    public override ConditionState Check()
+    {
         return Status;
     }
     
-	// Use this for initialization
+    // Use this for initialization
     void Start()
     {
         Status = new ConditionState();
@@ -20,9 +20,9 @@ public class PlayerGroundCollisionDetector : Condition {
         Status.isSatisfied = true;
     }
 
-	// Update is called once per frame
-	void Update () {
-		bool onGround =
+    // Update is called once per frame
+    void Update () {
+        bool onGround =
             Physics2D.Linecast(transform.position - (transform.right * 0.3f),
             transform.position - (transform.up * 0.1f), groundLayer) ||
             Physics2D.Linecast(transform.position + (transform.right * 0.3f),

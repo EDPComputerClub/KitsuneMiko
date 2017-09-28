@@ -5,8 +5,8 @@ using UnityEngine;
 public class JumpKeyCondition : Condition {
 
     ConditionState Status;
-	public override ConditionState Check()
-	{
+    public override ConditionState Check()
+    {
         return Status;
     }
 
@@ -16,7 +16,7 @@ public class JumpKeyCondition : Condition {
         Status.isSatisfied = true;
         Status.args.Add("SPACE", false);
     }
-	
+    
     // Update is called once per frame
     void Update () {
         Status.args["SPACE"] = Input.GetKey(KeyCode.Space);

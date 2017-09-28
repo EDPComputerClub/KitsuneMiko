@@ -27,15 +27,15 @@ public class GameManager : MonoBehaviour {
     public AudioClip clearSE;
     public AudioClip gameoverSE;
     private AudioSource audioSource;
-	// Use this for initialization
-		
-	void Start () {
+    // Use this for initialization
+        
+    void Start () {
         RefreshScore();
         audioSource = this.gameObject.GetComponent<AudioSource>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    }
+    
+    // Update is called once per frame
+    void Update () {
         if (score > displayScore)
         {
             displayScore += 10;
@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviour {
 
             RefreshScore();
         }
-	}
+    }
 
     public void GameOver()
     {

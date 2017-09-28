@@ -12,7 +12,7 @@ public class PlayerAnimatorHandler : MonoBehaviour {
         animator = gameObject.GetComponent<Animator>();
         rbody = gameObject.GetComponent<Rigidbody2D>();
     }
-	
+    
     // Update is called once per frame
     void FixedUpdate () {
         bool canJump =

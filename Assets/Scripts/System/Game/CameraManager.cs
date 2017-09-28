@@ -12,8 +12,8 @@ public class CameraManager : MonoBehaviour {
     private const float FRAME_HALF_WIDTH = 0.5f;
     Vector3 p1,p2,cameraPos;
     private float distans;
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         gameManager = GameObject.Find("GameManager");
         camera = gameObject.GetComponent<Camera>();
         cameraPos = new Vector3(player.transform.position.x, transform.position.y, transform.position.z);
@@ -22,9 +22,9 @@ public class CameraManager : MonoBehaviour {
         
         distans = player.transform.position.x-p1.x;//プレイヤー座標と画面端の距離を取得
     }
-	
-	// Update is called once per frame
-	void Update () {
+    
+    // Update is called once per frame
+    void Update () {
         if (gameManager.GetComponent<GameManager>().gameMode == GameManager.GAME_MODE.PLAY)
         {
             cameraPos.x = player.transform.position.x;//デフォルトではプレイヤー座標に合わせてカメラ座標を更新
@@ -47,5 +47,5 @@ public class CameraManager : MonoBehaviour {
 
 
         camera.transform.position = cameraPos;//カメラ座標の更新
-	}
+    }
 }

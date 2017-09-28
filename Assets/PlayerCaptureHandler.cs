@@ -8,7 +8,7 @@ public class PlayerCaptureHandler : MonoBehaviour {
     void Start () {
         gameObject.GetComponent<CollisionDetector>().remotedMethods += HitMethod;
     }
-	
+    
     // Update is called once per frame
     void Update () {
         

@@ -9,15 +9,15 @@ public class OrbManager : MonoBehaviour {
 
     private GameObject gameManager;//ゲームのマネージャー
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         gameManager = GameObject.Find("GameManager");
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    }
+    
+    // Update is called once per frame
+    void Update () {
+        
+    }
     //オーブ入手処理
     public void GetOrb()
     {

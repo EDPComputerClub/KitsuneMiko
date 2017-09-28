@@ -7,15 +7,15 @@ public class PlayerWalk : Action {
     bool _isDone = true;
 
     public override bool IsDone()
-	{
+    {
         return _isDone;
     }
 
     public float walkSpeed = 3f;
     public override void Act(Dictionary<string, object> args)
-	{
+    {
         float moveSpeed = 0f;
-		Rigidbody2D rbody = gameObject.GetComponent<Rigidbody2D>();
+        Rigidbody2D rbody = gameObject.GetComponent<Rigidbody2D>();
         switch ((PlayerWalkCondition.WALK_DIR)System.Enum.Parse(typeof(PlayerWalkCondition.WALK_DIR), (string)args["movingDirection"]))
         {
             case PlayerWalkCondition.WALK_DIR.IDLE:

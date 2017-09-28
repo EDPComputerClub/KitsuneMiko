@@ -14,7 +14,7 @@ public class PlayerAttackCondition : Condition {
     void Start () {
         Status = new ConditionState();
     }
-	
+    
     // Update is called once per frame
     void Update () {
         Status.isSatisfied = Input.GetKeyDown(KeyCode.C);

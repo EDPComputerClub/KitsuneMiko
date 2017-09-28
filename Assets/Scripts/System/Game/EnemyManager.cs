@@ -49,17 +49,17 @@ public class EnemyManager : MonoBehaviour {
 
     private MOVE_DIR moveDirection = MOVE_DIR.LEFT;//移動方法
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         rbody = GetComponent<Rigidbody2D>();
         gameManager = GameObject.Find("GameManager");
 
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    }
+    
+    // Update is called once per frame
+    void Update () {
+        
+    }
 
     void FixedUpdate()
     {
