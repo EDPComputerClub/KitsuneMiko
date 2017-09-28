@@ -64,7 +64,7 @@ public class PlayerManager : MonoBehaviour
     {
         Attack(Input.GetKeyDown(KeyCode.C));
 
-        Charge(Input.GetKeyDown(KeyCode.C), Input.GetKey(KeyCode.C), Input.GetKeyUp(KeyCode.C));
+        Charge(Input.GetKey(KeyCode.C));
     }
 
     void Attack(bool isAttackKeyPressed)
@@ -135,38 +135,41 @@ public class PlayerManager : MonoBehaviour
         // after that she cannot start charging after the next attack
     bool isPreparingForCharging = false;
     bool isCharging = false;
-    Timer chargingTimer;
-    float chargingTime = 1f;
     bool isCapturing = false;
-    void Charge(bool isChargeButtonPressedOn, bool isChargeButtonKeptPressed, bool isChargeButtonPressedUp)
+    Timer chargingTimer;
+    public float chargingPreparationTime = 1f;
+    public float chargingTime = 1f;
+    void Charge(bool isChargeButtonKeptPressed)
     {
-        if (isChargeButtonPressedOn && !isCharging)
+        // チャージの開始準備期間のトリガー発火
+        if (isChargeButtonKeptPressed && !isPreparingForCharging && !isCharging)
         {
             chargingTimer.Begin();
             isPreparingForCharging = true;
         }
 
-        if (chargingTimer.ElapsedTime < chargingTime)
+        // チャージ開始までにキーを離した時にリセット
+        if (chargingTimer.ElapsedTime < chargingTime && isPreparingForCharging && !isChargeButtonKeptPressed)
         {
-            if (isPreparingForCharging && isChargeButtonPressedUp)
-            {
-                isPreparingForCharging = false;
-                chargingTimer.Stop();
-            }
+            isPreparingForCharging = false;
+            chargingTimer.Stop();
         }
 
-        if(isPreparingForCharging && isChargeButtonKeptPressed && chargingTimer.ElapsedTime > chargingTime)
+        // チャージ開始
+        if (isPreparingForCharging && isChargeButtonKeptPressed && chargingTimer.ElapsedTime > chargingPreparationTime)
         {
             isCharging = true;
             isPreparingForCharging = false;
             chargingTimer.Begin(true);
         }
 
+        // チャージしているならカウントアップ
         if (isCharging && isChargeButtonKeptPressed)
         {
             Debug.Log(chargingTimer.ElapsedTime);
         }
-        else if (isCharging && isChargeButtonPressedUp && chargingTimer.ElapsedTime > 1f)
+        // 十分チャージしてるならチャージの試行を行う
+        else if (isCharging && !isChargeButtonKeptPressed && chargingTimer.ElapsedTime > chargingTime)
         {
             Debug.Log("Attempting to capture");
             isCapturing = true;
@@ -174,6 +177,7 @@ public class PlayerManager : MonoBehaviour
             captureBox.SetActive(true);
         }
 
+        // キャプチャーアニメーション終了後の処理
         if (isCapturing && chargingTimer.ElapsedTime > 0.8f)
         {
             isCapturing = false;
@@ -181,6 +185,7 @@ public class PlayerManager : MonoBehaviour
             captureBox.SetActive(false);
         }
 
+        // チャージ中にボタンを離されたらリセット
         if (isCharging && !isChargeButtonKeptPressed)
         {
             isCharging = false;
@@ -191,7 +196,7 @@ public class PlayerManager : MonoBehaviour
     //衝突処理
     void OnTriggerEnter2D(Collider2D col)
     {
-        
+
         if (gameManager.GetComponent<GameManager>().gameMode != GameManager.GAME_MODE.PLAY)
         {
             return;
