@@ -12,20 +12,20 @@ public class PlayerWalkCondition : Condition {
     WALK_DIR movingDirection = WALK_DIR.IDLE;
 
     ConditionState Status;
-	public override ConditionState Check()
-	{
+    public override ConditionState Check()
+    {
         return Status;
     }
     
-	// Use this for initialization
+    // Use this for initialization
     void Start()
     {
         Status = new ConditionState();
         Status.args.Add("movingDirection", WALK_DIR.IDLE);
     }
 
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    void Update () {
         if (Input.GetKey(KeyCode.LeftArrow))
         {
             movingDirection = WALK_DIR.LEFT;
@@ -43,6 +43,6 @@ public class PlayerWalkCondition : Condition {
 
         // Idle => Idle時の移行では常にisSatisfiedはfalseになる.
         // それ以外の場合はActionを常に実行しなければいけないのでtrue
-        Status.isSatisfied = gameObject.GetComponent<Rigidbody2D>().velocity.x != 0f || movingDirection != WALK_DIR.IDLE;
+        Status.isSatisfied = movingDirection != WALK_DIR.IDLE;
     }
 }
