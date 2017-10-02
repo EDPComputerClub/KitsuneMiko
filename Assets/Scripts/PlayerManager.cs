@@ -62,74 +62,9 @@ public class PlayerManager : MonoBehaviour
     }
     void Update()
     {
-        Attack(Input.GetKeyDown(KeyCode.C));
-
-        Charge(Input.GetKey(KeyCode.C));
+        //Charge(Input.GetKey(KeyCode.C));
     }
-
-    void Attack(bool isAttackKeyPressed)
-    {
-        bool _isAttackKeyPressed = isAttackKeyReceived ? isAttackKeyPressed : false;
-
-        // Attack Registration
-        if (_isAttackKeyPressed && !isNextAttackRegistered)
-        {
-            // 1st attack registration and implementation
-            if (finishedAttackNum == (int)AttackNumber.Idle && nextAttackNum == (int)AttackNumber.First)
-            {
-                animator.SetTrigger("attack");
-                presentWeapon.SetActive(true);
-                animationProcessedTimer.Begin();
-                nextAttackNum = (int)AttackNumber.Second;
-                Debug.Log("1 attack animation implemented");
-            }
-            // 2nd to 4th attack registration
-            else if ((int)AttackNumber.Second <= nextAttackNum && nextAttackNum <= (int)AttackNumber.Fourth)
-            {
-                if (animationProcessedTimer.ElapsedTime * 12f < AttackAnimationDuration[nextAttackNum - 2])
-                {
-                    isAttackKeyReceived = false;
-                    isNextAttackRegistered = true;
-                }
-            }
-        }
-
-        // Attack Implementation
-        if (1 < nextAttackNum && nextAttackNum < 5 && animationProcessedTimer.ElapsedTime * 12f > AttackAnimationDuration[nextAttackNum - 2])
-        {
-            if (isNextAttackRegistered)
-            {
-                // implement next attack if next attack was already registered
-                finishedAttackNum += 1;
-                nextAttackNum += 1;
-                animationProcessedTimer.Begin();
-                presentWeapon.SetActive(true);
-                animator.SetTrigger("attack");
-                isAttackKeyReceived = true;
-                isNextAttackRegistered = false;
-                Debug.Log((finishedAttackNum + 1) + " attack animation implemented");
-            }
-            else
-            {
-                // implement sleep procedure to set up some settings
-                nextAttackNum = (int)AttackNumber.Reset;
-                animationProcessedTimer.Begin();
-                presentWeapon.SetActive(false);
-                isAttackKeyReceived = false;
-                isNextAttackRegistered = false;
-            }
-        }
-
-        //when fourth attack animation finished
-        if (nextAttackNum == (int)AttackNumber.Reset && animationProcessedTimer.ElapsedTime * 12f > 6f * 1.5f)
-        {
-            presentWeapon.SetActive(false);
-            isAttackKeyReceived = true;
-            finishedAttackNum = (int)AttackNumber.Idle;
-            nextAttackNum = (int)AttackNumber.First;
-        }
-    }
-
+    
     enum ChargeStatus : int
     {
         Idle = 0,

@@ -1,19 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class PlayerAttack : Action {
 
-    bool _isDone = true;
+    bool _IsDone = false;
     public override bool IsDone()
-    {
-        return _isDone;
+	{
+        return _IsDone;
     }
-
-    // timer that holds animation playtime
-    private Timer timer;
+    int count = 0;
+	// Timer that holds animation playtime
+    private Timer animationProcessedTimer;
     // flag that enables player to input attack key
-    private bool isAttackKeyReceiving = true;
+    private bool isAttackKeyReceived = true;
     // if next attack is registered or not
     private bool isNextAttackRegistered = false;
     // counts of finished animations
@@ -25,42 +26,65 @@ public class PlayerAttack : Action {
         Idle = 0, First, Second, Third, Fourth, Reset
     }
     private int[] AttackAnimationDuration = new int[4] { 6, 6, 6, 6 };
-    Animator animator;
+	GameObject presentWeapon;
+    public GameObject purificationStick;
+    private Animator animator;  //アニメーター
+
     public override void Act(Dictionary<string, object> args)
+	{
+        // Attack Procedure
+        Attack();
+
+        gameObject.GetComponent<PlayerAttackCondition>().countOfAttacking = 0;
+    }
+
+	// Use this for initialization
+	void Start () {
+        animator = GetComponent<Animator>();
+        animationProcessedTimer = gameObject.GetComponents<Timer>().First(x => x.timerName == "animation");
+        presentWeapon = purificationStick;
+	}
+
+	void Attack()
     {
+        // TODO: キー入力が無くても時間が経てば武器のColliderが消えるようにする -> Update()を使うか、animationのflag eventを使うか。
+
         // Attack Registration
-        if (isNextAttackRegistered)
+        if (isAttackKeyReceived && !isNextAttackRegistered)
         {
+            _IsDone = false;
             // 1st attack registration and implementation
             if (finishedAttackNum == (int)AttackNumber.Idle && nextAttackNum == (int)AttackNumber.First)
             {
                 animator.SetTrigger("attack");
-                timer.Begin();
+                presentWeapon.SetActive(true);
+                animationProcessedTimer.Begin();
                 nextAttackNum = (int)AttackNumber.Second;
                 Debug.Log("1 attack animation implemented");
             }
             // 2nd to 4th attack registration
             else if ((int)AttackNumber.Second <= nextAttackNum && nextAttackNum <= (int)AttackNumber.Fourth)
             {
-                if (timer.ElapsedTime * 12f < AttackAnimationDuration[nextAttackNum - 2])
+                if (animationProcessedTimer.ElapsedTime * 12f < AttackAnimationDuration[nextAttackNum - 2])
                 {
-                    isAttackKeyReceiving = false;
+                    isAttackKeyReceived = false;
                     isNextAttackRegistered = true;
                 }
             }
         }
 
         // Attack Implementation
-        if (1 < nextAttackNum && nextAttackNum < 5 && timer.ElapsedTime * 12f > AttackAnimationDuration[nextAttackNum - 2])
+        if (1 < nextAttackNum && nextAttackNum < 5 && animationProcessedTimer.ElapsedTime * 12f > AttackAnimationDuration[nextAttackNum - 2])
         {
             if (isNextAttackRegistered)
             {
                 // implement next attack if next attack was already registered
                 finishedAttackNum += 1;
                 nextAttackNum += 1;
-                timer.Begin();
+                animationProcessedTimer.Begin();
+                presentWeapon.SetActive(true);
                 animator.SetTrigger("attack");
-                isAttackKeyReceiving = true;
+                isAttackKeyReceived = true;
                 isNextAttackRegistered = false;
                 Debug.Log((finishedAttackNum + 1) + " attack animation implemented");
             }
@@ -68,28 +92,21 @@ public class PlayerAttack : Action {
             {
                 // implement sleep procedure to set up some settings
                 nextAttackNum = (int)AttackNumber.Reset;
-                timer.Begin();
-                isAttackKeyReceiving = false;
+                animationProcessedTimer.Begin();
+                presentWeapon.SetActive(false);
+                isAttackKeyReceived = false;
                 isNextAttackRegistered = false;
             }
         }
 
-        //when fourth attack animation finished
-        if (nextAttackNum == (int)AttackNumber.Reset && timer.ElapsedTime * 12f > 6f * 1.5f)
+        //when fourth attack animation finished or reset is called
+        if (nextAttackNum == (int)AttackNumber.Reset && animationProcessedTimer.ElapsedTime > 1.5f)
         {
-            isAttackKeyReceiving = true;
-            finishedAttackNum = 0;
-            nextAttackNum = 1;
+            presentWeapon.SetActive(false);
+            isAttackKeyReceived = true;
+            finishedAttackNum = (int)AttackNumber.Idle;
+            nextAttackNum = (int)AttackNumber.First;
+            _IsDone = true;
         }
-    }
-
-    // Use this for initialization
-    void Start () {
-        animator = gameObject.GetComponent<Animator>();
-    }
-    
-    // Update is called once per frame
-    void Update () {
-        
     }
 }

@@ -928,11 +928,11 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4194723698078112, guid: 4e66e8b01b80b1541a4da72b2c2e81d6, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0.21509
+      value: 6.98
       objectReference: {fileID: 0}
     - target: {fileID: 4194723698078112, guid: 4e66e8b01b80b1541a4da72b2c2e81d6, type: 2}
       propertyPath: m_LocalPosition.y
-      value: -1.4443
+      value: 1.22
       objectReference: {fileID: 0}
     - target: {fileID: 4194723698078112, guid: 4e66e8b01b80b1541a4da72b2c2e81d6, type: 2}
       propertyPath: m_LocalPosition.z
@@ -2468,12 +2468,17 @@ GameObject:
   - component: {fileID: 908368852}
   - component: {fileID: 908368842}
   - component: {fileID: 908368841}
-  - component: {fileID: 908368840}
-  - component: {fileID: 908368839}
   - component: {fileID: 908368838}
   - component: {fileID: 908368837}
-  - component: {fileID: 908368836}
   - component: {fileID: 908368851}
+  - component: {fileID: 908368853}
+  - component: {fileID: 908368850}
+  - component: {fileID: 908368855}
+  - component: {fileID: 908368854}
+  - component: {fileID: 908368856}
+  - component: {fileID: 908368840}
+  - component: {fileID: 908368839}
+  - component: {fileID: 908368836}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -2484,16 +2489,16 @@ GameObject:
 --- !u!114 &908368836
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 114009091673647524, guid: 93b0139dc4146d444870185916ca3585,
-    type: 2}
+  m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 908368835}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1ea397375e717c4895a395ef53568e8, type: 3}
+  m_Script: {fileID: 11500000, guid: 5482e28e2a6c2994f81c5ffddab90fd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  conditionName: JumpKeyCondition
+  actionName: JumpDecline
+  fallEnhance: 15
 --- !u!114 &908368837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2524,36 +2529,28 @@ MonoBehaviour:
 --- !u!114 &908368839
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 114608208368860824, guid: 93b0139dc4146d444870185916ca3585,
-    type: 2}
+  m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 908368835}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d24ecf3767d96cd469fb5646b0a1889a, type: 3}
+  m_Script: {fileID: 11500000, guid: a1248a3a8291f8f43b4a7334bf17d96f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  conditionName: JumpCondition
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 256
+  conditionName: JumpDeclineCondition
 --- !u!114 &908368840
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 114744887314565410, guid: 93b0139dc4146d444870185916ca3585,
-    type: 2}
+  m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 908368835}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ebedf144e1fa3d4ea6eca2373863d91, type: 3}
+  m_Script: {fileID: 11500000, guid: 1571b2b79d1d0b646af585dd7c374d89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actionName: Jump
-  jumpSE: {fileID: 8300000, guid: c4ec3d4182acd8a408cebb0baacc437e, type: 3}
-  manager: {fileID: 171253633}
-  jumpForce: 300
-  fallEnhance: 15
+  actionName: JumpRise
+  jumpForce: 400
 --- !u!114 &908368841
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2573,14 +2570,32 @@ MonoBehaviour:
     - conditionName: WalkCondition
       not: 0
     weight: 1
-    blockActions:
-    - PlayerJump
-  - actionName: Jump
+    blockActions: []
+  - actionName: JumpRise
     order: 1
     conditions:
-    - conditionName: JumpCondition
+    - conditionName: JumpRiseCondition
       not: 0
-    - conditionName: JumpKeyCondition
+    weight: 1
+    blockActions: []
+  - actionName: Attack
+    order: 3
+    conditions:
+    - conditionName: AttackCondition
+      not: 0
+    weight: 1
+    blockActions: []
+  - actionName: Charge
+    order: 4
+    conditions:
+    - conditionName: ChargeCondition
+      not: 0
+    weight: 1
+    blockActions: []
+  - actionName: JumpDecline
+    order: 5
+    conditions:
+    - conditionName: JumpDeclineCondition
       not: 0
     weight: 1
     blockActions: []
@@ -2605,6 +2620,9 @@ MonoBehaviour:
   jumpSE: {fileID: 8300000, guid: c4ec3d4182acd8a408cebb0baacc437e, type: 3}
   getSE: {fileID: 8300000, guid: 6ea156bd67b55954e991ffe5b5349256, type: 3}
   stampSE: {fileID: 8300000, guid: 6642f50c4c2806b45959bc94ff86f90d, type: 3}
+  chargingPreparationTime: 1
+  chargingTime: 1
+  animationDuration: 0.8
 --- !u!114 &908368843
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2758,6 +2776,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &908368850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 908368835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc8652479a89ea34c8a5b0a8a68d0bf7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  conditionName: AttackCondition
+  countOfAttacking: 0
 --- !u!114 &908368851
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2771,7 +2802,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
 --- !u!114 &908368852
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2784,6 +2815,62 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timerName: charging
+--- !u!114 &908368853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 908368835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bfca87037c594a4b8cfeae70811f493, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionName: Attack
+  purificationStick: {fileID: 1231461724}
+--- !u!114 &908368854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 908368835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ff391f0746c1d44d8b176ad043fb43a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  conditionName: ChargeCondition
+--- !u!114 &908368855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 908368835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e1f0ba03249fb247988cefe3909b639, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionName: Charge
+  chargingPreparationTime: 1
+  chargingTime: 1
+  animationDuration: 0.8
+  captureBox: {fileID: 499882806}
+--- !u!114 &908368856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 908368835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e09a642df2fa1d45a04687ae678a9cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  conditionName: JumpRiseCondition
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!4 &910119257 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4409745318967056, guid: 6dce2bd20de43a140a0f92777b920077,
@@ -2798,11 +2885,11 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4194723698078112, guid: 4e66e8b01b80b1541a4da72b2c2e81d6, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 5.0151
+      value: 7.19
       objectReference: {fileID: 0}
     - target: {fileID: 4194723698078112, guid: 4e66e8b01b80b1541a4da72b2c2e81d6, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 0.95567
+      value: 1.43
       objectReference: {fileID: 0}
     - target: {fileID: 4194723698078112, guid: 4e66e8b01b80b1541a4da72b2c2e81d6, type: 2}
       propertyPath: m_LocalPosition.z

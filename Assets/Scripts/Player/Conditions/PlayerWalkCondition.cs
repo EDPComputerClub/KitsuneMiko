@@ -40,9 +40,7 @@ public class PlayerWalkCondition : Condition {
         }
         // movingDirectionをstring型でPlayerWalk.csに渡してPlayerWalk.csでenum型に直す
         Status.args["movingDirection"] = movingDirection.ToString();
-
-        // Idle => Idle時の移行では常にisSatisfiedはfalseになる.
-        // それ以外の場合はActionを常に実行しなければいけないのでtrue
-        Status.isSatisfied = movingDirection != WALK_DIR.IDLE;
+        bool wasPlayerIdling = gameObject.GetComponent<Rigidbody2D>().velocity.x == 0;
+        Status.isSatisfied = !(wasPlayerIdling && movingDirection == WALK_DIR.IDLE);
     }
 }
