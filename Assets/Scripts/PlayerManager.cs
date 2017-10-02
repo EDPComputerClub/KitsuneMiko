@@ -67,6 +67,14 @@ public class PlayerManager : MonoBehaviour
         Charge(Input.GetKey(KeyCode.C));
     }
 
+    /*
+        Conditionによって攻撃キーの取得(Update)
+        とりあえずキューに入れとく(Update)
+        Actが呼び出された時にそのキューの中身を空っぽにしてやる(FixedUpdate => Update)
+        (Conditionのキューに２つほど溜まったらStops Listening)
+        最初に戻る
+
+     */
     void Attack(bool isAttackKeyPressed)
     {
         bool _isAttackKeyPressed = isAttackKeyReceived ? isAttackKeyPressed : false;
@@ -128,6 +136,14 @@ public class PlayerManager : MonoBehaviour
             finishedAttackNum = (int)AttackNumber.Idle;
             nextAttackNum = (int)AttackNumber.First;
         }
+    }
+
+    /// <summary>
+    /// This function is called every fixed framerate frame, if the MonoBehaviour is enabled.
+    /// </summary>
+    void FixedUpdate()
+    {
+        
     }
 
     enum ChargeStatus : int
