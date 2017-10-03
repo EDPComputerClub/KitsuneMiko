@@ -64,9 +64,6 @@ public class PlayerManager : MonoBehaviour
     {
         //Charge(Input.GetKey(KeyCode.C));
     }
-<<<<<<< HEAD
-    
-=======
 
     /*
         Conditionによって攻撃キーの取得(Update)
@@ -146,8 +143,6 @@ public class PlayerManager : MonoBehaviour
     {
         
     }
-
->>>>>>> 47d174a1ff102a589f69fa26506f27b5bc1d0903
     enum ChargeStatus : int
     {
         Idle = 0,
