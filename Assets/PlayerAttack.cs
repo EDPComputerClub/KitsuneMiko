@@ -41,7 +41,7 @@ public class PlayerAttack : Action {
     bool isAttackAnimationFinished = true;
     void AnimationStart()
     {
-        isAttackanimationfinished = true;
+        isAttackAnimationFinished = true;
     }
     void AnimationEnd()
     {
@@ -72,7 +72,7 @@ public class PlayerAttack : Action {
                 Debug.Log("1 attack animation implemented");
             }
             // ２回目～４回目の攻撃の予約
-            else if (nextAttackNum >= (int)Attacknumber.Second && nextAttackNum <= (int)Attacknumber.Fourth)
+            else if (nextAttackNum >= (int)AttackNumber.Second && nextAttackNum <= (int)AttackNumber.Fourth)
             {
                 // 今行っているアニメーションが終わっていないのであれば
                 // 次の攻撃の予約を入れる
