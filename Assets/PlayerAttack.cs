@@ -3,133 +3,129 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class PlayerAttack : Action {
+public class PlayerAttack : Action
+{
+
+    // 攻撃後のクールダウン時間
+    public float sleepTime = 1.5f;
 
     bool _IsDone = false;
     public override bool IsDone()
-	{
+    {
         return _IsDone;
     }
-    int count = 0;
-	// Timer that holds animation playtime
-    private Timer animationProcessedTimer;
     // flag that enables player to input attack key
-    private bool isAttackKeyReceived = true;
+    private bool isKeyReceived = true;
     // if next attack is registered or not
-    private bool isNextAttackRegistered = false;
-    // counts of finished animations
-    private int finishedAttackNum = 0;
+    private bool isNextRegistered = false;
     // number of next attack
-    private int nextAttackNum = 1;
-    private enum AttackNumber : int
+    private int nextNumber = (int)Situations.Idle;
+    private enum Situations : int
     {
-        Idle = 0, First, Second, Third, Fourth, Reset
+        Reset = -1, Idle = 0
     }
-    private int[] AttackAnimationDuration = new int[4] { 6, 6, 6, 6 };
-	GameObject presentWeapon;
+    GameObject presentWeapon;
     public GameObject purificationStick;
-    private Animator animator;  //アニメーター
+    Animator animator;
+    PlayerAttackCondition playerAttackCondition;
+
 
     public override void Act(Dictionary<string, object> args)
-	{
+    {
         // Attack Procedure
-        Attack();
+        AttackRegister();
+        if (playerAttackCondition.Count > 1)
+        {
+            Invoke("AttackRegister", playerAttackCondition.Interval);
+        }
 
-        gameObject.GetComponent<PlayerAttackCondition>().countOfAttacking = 0;
+        playerAttackCondition.Count = 0;
     }
 
     bool isAttackAnimationFinished = true;
-    void AnimationStart()
+    // condition : 0 => Animation Started, 1 => Animation Ended
+    void AnimationFlag(int condition)
     {
-        isAttackAnimationFinished = true;
-    }
-    void AnimationEnd()
-    {
-        isAttackAnimationFinished = false;
+        isAttackAnimationFinished = condition == 1;
     }
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         animator = GetComponent<Animator>();
-        animationProcessedTimer = gameObject.GetComponents<Timer>().First(x => x.timerName == "animation");
+        playerAttackCondition = gameObject.GetComponent<PlayerAttackCondition>();
         presentWeapon = purificationStick;
-	}
+    }
 
-	void Attack()
+    void AttackRegister()
     {
-        // TODO: キー入力が無くても時間が経てば武器のColliderが消えるようにする -> Update()を使うか、animationのflag eventを使うか。
-
         _IsDone = false;
 
-        if (!isNextAttackRegistered)
+        if (!isNextRegistered)
         {
             // 最初の攻撃の実行
-            if (finishedAttackNum == (int)AttackNumber.Idle && nextAttackNum == (int)AttackNumber.First)
+            if (nextNumber == (int)Situations.Idle)
             {
-                animator.SetTrigger("attack");
-                presentWeapon.SetActive(true);
-                nextAttackNum = (int)AttackNumber.Second;
-                Debug.Log("1 attack animation implemented");
+                nextNumber = 1;
             }
             // ２回目～４回目の攻撃の予約
-            else if (nextAttackNum >= (int)AttackNumber.Second && nextAttackNum <= (int)AttackNumber.Fourth)
+            else if (nextNumber > 1 && nextNumber < 5)
             {
                 // 今行っているアニメーションが終わっていないのであれば
                 // 次の攻撃の予約を入れる
                 if (!isAttackAnimationFinished)
                 {
-                    isAttackKeyReceived = false;
-                    isNextAttackRegistered = true;
+                    isKeyReceived = false;
+                    isNextRegistered = true;
                 }
             }
         }
+    }
 
-        // ２回目～４回目の攻撃の実行
-        if (1 < nextAttackNum && nextAttackNum < 5 && isAttackAnimationFinished)
+    void Implementation()
+    {
+        // １回目の攻撃の処理
+        if (nextNumber == 1)
         {
-            // 攻撃が予約されているなら
-            if (isNextAttackRegistered)
+            animator.SetTrigger("attack");
+            presentWeapon.SetActive(true);
+            nextNumber++;
+            isKeyReceived = true;
+            isNextRegistered = true;
+        }
+        // ２回目～４回目の攻撃の処理
+        else if (1 < nextNumber && nextNumber < 6 && isAttackAnimationFinished)
+        {
+            // 攻撃が予約されているなら攻撃実行
+            if (isNextRegistered)
             {
-                finishedAttackNum += 1;
-                nextAttackNum += 1;
-                presentWeapon.SetActive(true);
                 animator.SetTrigger("attack");
-                isAttackKeyReceived = true;
-                isNextAttackRegistered = false;
-                Debug.Log((finishedAttackNum + 1) + " attack animation implemented");
+                presentWeapon.SetActive(true);
+                nextNumber++;
+                isKeyReceived = true;
+                isNextRegistered = false;
             }
+            // 攻撃が予約されていないなら状態を初期化する
             else
             {
-                // implement sleep procedure to set up some settings
-                nextAttackNum = (int)AttackNumber.Reset;
                 presentWeapon.SetActive(false);
-                isAttackKeyReceived = false;
-                isNextAttackRegistered = false;
+                nextNumber = (int)Situations.Reset;
+                isKeyReceived = false;
+                isNextRegistered = false;
+                Invoke("Initialization", sleepTime);
             }
         }
     }
-    
-    void AttackInitialization()
-    {
-        
 
-        // ４回目の攻撃が終わった後、またはリセットが呼び出されときに初期化をする
-        if (nextAttackNum == (int)AttackNumber.Reset && animationProcessedTimer.ElapsedTime > 1.5f)
-        {
-            presentWeapon.SetActive(false);
-            isAttackKeyReceived = true;
-            finishedAttackNum = (int)AttackNumber.Idle;
-            nextAttackNum = (int)AttackNumber.First;
-            _IsDone = true;
-        }
+    void Initialization()
+    {
+        isKeyReceived = true;
+        nextNumber = (int)Situations.Idle;
+        _IsDone = true;
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        // 攻撃アニメーションが終了後、一定時間キー入力を受け付けず、その後初期化する
-        if (nextAttackNum > 0 && !isNextAttackRegistered && isAttackAnimationFinished)
-        {
-
-        }
+        Implementation();
     }
 }
