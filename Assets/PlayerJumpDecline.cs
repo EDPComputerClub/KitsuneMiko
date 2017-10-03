@@ -17,6 +17,8 @@ public class PlayerJumpDecline : Action {
         Debug.Log("Declined");
         rbody.AddForce(Vector2.down * fallEnhance * rbody.velocity.y);
         _IsDone = true;
+        // 一度ジャンプの減速を行えばPlayerJumpDeclineのConditionのStatus.isSatisfiedをtrueにしてやる
+        gameObject.GetComponent<PlayerJumpDeclineCondition>().Status.isSatisfied = false;
     }
 
 	// Use this for initialization
@@ -26,7 +28,6 @@ public class PlayerJumpDecline : Action {
 	
 	// Update is called once per frame
 	void Update () {
-		// IsDoneは初期化されるのか？
-		// IsSatisfiedは読み込まれたあとそのままなのか？
+
 	}
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerJumpDeclineCondition : Condition {
 
 
-    ConditionState Status;
+    public ConditionState Status;
 	public override ConditionState Check()
 	{
         return Status;
@@ -18,22 +18,14 @@ public class PlayerJumpDeclineCondition : Condition {
         Status.isSatisfied = false;
     }
 
-    // TODO : Status.isSatisfiedはPlayerJumpDecline.csから行うべき
 
 	// Update is called once per frame
 	void Update () {
         bool isJumping = gameObject.GetComponent<PlayerJumpRise>().isJumping;
-        if (Status.isSatisfied)
-        {
-            Debug.Log(Status.isSatisfied);
-        }
+        // プレイヤーがジャンプ中にスペースバーを離したかどうか調べる
         if (isJumping && Input.GetKeyUp(KeyCode.Space) && gameObject.GetComponent<Rigidbody2D>().velocity.y > 0)
         {
             Status.isSatisfied = true;
-        }
-        else
-        {
-            Status.isSatisfied = false;
         }
     }
 }

@@ -143,6 +143,7 @@ public class PlayerManager : MonoBehaviour
     {
         
     }
+    
     enum ChargeStatus : int
     {
         Idle = 0,
