@@ -91,7 +91,7 @@ public class PlayerAttack : Action
             presentWeapon.SetActive(true);
             nextNumber++;
             isKeyReceived = true;
-            isNextRegistered = true;
+            isNextRegistered = false;
         }
         // ２回目～４回目の攻撃の処理
         else if (1 < nextNumber && nextNumber < 6 && isAttackAnimationFinished)
