@@ -2464,9 +2464,6 @@ GameObject:
   - component: {fileID: 908368846}
   - component: {fileID: 908368845}
   - component: {fileID: 908368844}
-  - component: {fileID: 908368843}
-  - component: {fileID: 908368852}
-  - component: {fileID: 908368842}
   - component: {fileID: 908368841}
   - component: {fileID: 908368838}
   - component: {fileID: 908368837}
@@ -2608,43 +2605,6 @@ MonoBehaviour:
       not: 0
     weight: 1
     blockActions: []
---- !u!114 &908368842
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 114874694715177476, guid: 93b0139dc4146d444870185916ca3585,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 908368835}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8cad332c6f80e08478d7dc771528a616, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  purificationStick: {fileID: 1231461724}
-  captureBox: {fileID: 499882806}
-  gameManager: {fileID: 171253633}
-  blockLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  jumpSE: {fileID: 8300000, guid: c4ec3d4182acd8a408cebb0baacc437e, type: 3}
-  getSE: {fileID: 8300000, guid: 6ea156bd67b55954e991ffe5b5349256, type: 3}
-  stampSE: {fileID: 8300000, guid: 6642f50c4c2806b45959bc94ff86f90d, type: 3}
-  chargingPreparationTime: 1
-  chargingTime: 1
-  animationDuration: 0.8
---- !u!114 &908368843
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 114228410771386852, guid: 93b0139dc4146d444870185916ca3585,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 908368835}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58f93a60e6c880a40b998655e5496ea7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timerName: animation
 --- !u!95 &908368844
 Animator:
   serializedVersion: 3
@@ -2811,18 +2771,6 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 256
---- !u!114 &908368852
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 908368835}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58f93a60e6c880a40b998655e5496ea7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timerName: charging
 --- !u!114 &908368853
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2866,6 +2814,7 @@ MonoBehaviour:
   chargingTime: 1
   animationDuration: 0.8
   captureBox: {fileID: 499882806}
+  _IsDone: 0
 --- !u!114 &908368856
 MonoBehaviour:
   m_ObjectHideFlags: 0
