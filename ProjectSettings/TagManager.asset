@@ -8,6 +8,7 @@ TagManager:
   - Goal
   - Enemy
   - Orb
+  - Neutral
   layers:
   - Default
   - TransparentFX
@@ -18,9 +19,9 @@ TagManager:
   - 
   - 
   - Block
-  - 
-  - 
-  - 
+  - Character
+  - Float
+  - Invincible
   - 
   - 
   - 
