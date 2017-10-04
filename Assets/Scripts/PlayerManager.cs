@@ -2,9 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System.Linq;
 
 public class PlayerManager : MonoBehaviour
 {
+    GameObject presentWeapon;
+    public GameObject purificationStick;
+
+    public GameObject captureBox;
+
     public GameObject gameManager;
 
     public LayerMask blockLayer;//ブロックレイヤー
@@ -13,43 +19,6 @@ public class PlayerManager : MonoBehaviour
 
     private const float MOVE_SPEED = 3;//移動速度固定値
     private float moveSpeed;//移動速度
-
-    private float jumpPowerTime = 0;//分岐時に使用するジャンプ力時間
-    private float tmpJumpPowerTime = 0;//加算中のジャンプ力時間
-    private float jumpPower = 400;//ジャンプ力
-    private bool goJump = false;//ジャンプしたか否か
-    private bool canJump = false;//ブロックに設置しているか否か
-    private int stateJump = 0;
-    //0.ジャンプしてない
-    //1.ジャンプした瞬間
-    //2.ジャンプ中かつジャンプボタンを押したまま
-    //3.ジャンプ中かつジャンプボタンを離した
-    private int jumpCount = 0;//ジャンプボタンを押下したときに増加するカウント（stateJumpと連動）
-
-    private bool onAttackKey = false;//攻撃キーを押したか否か
-    private int stateAttack = 0;
-    //0.攻撃のキー受付状態
-    //1.攻撃キーを押した瞬間
-    //2.初撃時間中に攻撃キーを離した
-    //3.2番目の攻撃時間中に攻撃キーをまだ押していない
-    //4.2番目の攻撃時間中に攻撃キーを押した瞬間
-    //5.2番目の攻撃時間中に攻撃キーを離した
-    //6.3番目の攻撃時間中に攻撃キーをまだ押していない
-    //7.3番目の攻撃時間中に攻撃キーを押した瞬間
-    //8.3番目の攻撃時間中に攻撃キーを離した
-    //何もしない
-    private int attackCount = 0;//最初の攻撃キーを押してから最後の攻撃の終了まで増加する
-    private bool onAttackCount;//攻撃カウント中か否か
-
-    private int attackNum = 0;//現在の攻撃回数
-    private const int ATTACK_NUM_MAX = 3;//攻撃回数の上限値
-
-    private int stateCKey = 0;
-    //0.Cキーが押されていない
-    //1.Cキーが押された瞬間
-    //2.Cキーが放された
-
-    private bool stop = false;//ストップしているかどうか
     private Animator animator;  //アニメーター
     public enum MOVE_DIR
     {
@@ -57,10 +26,6 @@ public class PlayerManager : MonoBehaviour
         LEFT,
         RIGHT,
     };
-
-    private MOVE_DIR moveDirection = MOVE_DIR.STOP;
-
-
     public AudioClip jumpSE;
     public AudioClip getSE;
     public AudioClip stampSE;
@@ -69,198 +34,178 @@ public class PlayerManager : MonoBehaviour
 
     private GameObject touchedOrb;  // 最後に触ったオーブ 初期値は null
 
+    // Timer that holds animation playtime
+    private Timer animationProcessedTimer;
+    // flag that enables player to input attack key
+    private bool isAttackKeyReceived = true;
+    // if next attack is registered or not
+    private bool isNextAttackRegistered = false;
+    // counts of finished animations
+    private int finishedAttackNum = 0;
+    // number of next attack
+    private int nextAttackNum = 1;
+    private enum AttackNumber : int
+    {
+        Idle = 0, First, Second, Third, Fourth, Reset
+    }
+    private int[] AttackAnimationDuration = new int[4] { 6, 6, 6, 6 };
+
     void Start()
     {
         audioSource = gameManager.GetComponent<AudioSource>();
         rbody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        animationProcessedTimer = gameObject.GetComponents<Timer>().First(x => x.timerName == "animation");
+        presentWeapon = purificationStick;
+        chargingTimer = gameObject.GetComponents<Timer>().First(x => x.timerName == "charging");
+        captureBox.SetActive(false);
     }
     void Update()
     {
-        //押しているボタンで分岐
-        if (Input.GetKey(KeyCode.LeftArrow))
+        //Charge(Input.GetKey(KeyCode.C));
+    }
+
+    /*
+        Conditionによって攻撃キーの取得(Update)
+        とりあえずキューに入れとく(Update)
+        Actが呼び出された時にそのキューの中身を空っぽにしてやる(FixedUpdate => Update)
+        (Conditionのキューに２つほど溜まったらStops Listening)
+        最初に戻る
+
+     */
+    void Attack(bool isAttackKeyPressed)
+    {
+        bool _isAttackKeyPressed = isAttackKeyReceived ? isAttackKeyPressed : false;
+
+        // Attack Registration
+        if (_isAttackKeyPressed && !isNextAttackRegistered)
         {
-            PushLeftButton();
-
-        }
-        else if (Input.GetKey(KeyCode.RightArrow))
-        {
-            PushRightButton();
-        }
-        else
-        {
-            ReleaseMoveButton();
-        }
-
-        canJump =
-            Physics2D.Linecast(transform.position - (transform.right * 0.3f),
-            transform.position - (transform.up * 0.1f), blockLayer) ||
-            Physics2D.Linecast(transform.position + (transform.right * 0.3f),
-            transform.position - (transform.up * 0.1f), blockLayer);
-
-        animator.SetBool("onGround", canJump);
-        //ストップしているかどうか（アニメーションに影響）
-        if (moveDirection == MOVE_DIR.STOP)
-        {
-            stop = true;
-
-        }
-        else
-        {
-            stop = false;
-        }
-        animator.SetBool("stop", stop);
-
-        //ジャンプできる場合は常にstateJumpを0にセット
-        if (canJump)
-        {
-            stateJump = 0;
-        }
-
-
-        bool oneFrameCKey = Input.GetKeyDown(KeyCode.C);//GetKeyDownはキーを1フレームだけ取得する
-
-
-        if (oneFrameCKey)//攻撃キーを押したときに攻撃カウントフラグをオン
-        {
-            onAttackCount = true;
-        }
-
-        // TODO: attackCount increases not constantly
-        if (onAttackCount)//攻撃カウントを増加
-        {
-            attackCount++;
-        }
-
-        if (0 < attackCount && attackCount < 60)//時間内に
-        {
-            // 1フレームしか取得しないからattackNum = 1にしかならないのでは？
-            if (oneFrameCKey)
+            // 1st attack registration and implementation
+            if (finishedAttackNum == (int)AttackNumber.Idle && nextAttackNum == (int)AttackNumber.First)
             {
-                if (attackNum < 3)
-                {
-                    attackNum++;
-                }
-
+                animator.SetTrigger("attack");
+                presentWeapon.SetActive(true);
+                animationProcessedTimer.Begin();
+                nextAttackNum = (int)AttackNumber.Second;
+                Debug.Log("1 attack animation implemented");
             }
-
-            if (0 < attackCount && attackCount < 20)
+            // 2nd to 4th attack registration
+            else if ((int)AttackNumber.Second <= nextAttackNum && nextAttackNum <= (int)AttackNumber.Fourth)
             {
-                Debug.Log("stateAttack==1");
-            }
-            else if (20 <= attackCount && attackCount < 40)
-            {
-                if (attackNum == 2 || attackNum == 3)
+                if (animationProcessedTimer.ElapsedTime * 12f < AttackAnimationDuration[nextAttackNum - 2])
                 {
-                    Debug.Log("stateAttack==2");
-                }
-
-            }
-            else if (40 <= attackCount && attackCount < 60)
-            {
-                if (attackNum == 3)
-                {
-                    Debug.Log("stateAttack==3");
+                    isAttackKeyReceived = false;
+                    isNextAttackRegistered = true;
                 }
             }
-            
-            //アニメーション用
-            if (attackNum == 1 && 0 < attackCount && attackCount < 20)
+        }
+
+        // Attack Implementation
+        if (1 < nextAttackNum && nextAttackNum < 5 && animationProcessedTimer.ElapsedTime * 12f > AttackAnimationDuration[nextAttackNum - 2])
+        {
+            if (isNextAttackRegistered)
             {
-
-            }
-            if (attackNum == 2 && 20 <= attackCount && attackCount < 40)
-            {
-
-
-            }
-            if (attackNum == 3 && 40 <= attackCount && attackCount < 60)
-            {
-
+                // implement next attack if next attack was already registered
+                finishedAttackNum += 1;
+                nextAttackNum += 1;
+                animationProcessedTimer.Begin();
+                presentWeapon.SetActive(true);
+                animator.SetTrigger("attack");
+                isAttackKeyReceived = true;
+                isNextAttackRegistered = false;
+                Debug.Log((finishedAttackNum + 1) + " attack animation implemented");
             }
             else
             {
-                //何もしない
+                // implement sleep procedure to set up some settings
+                nextAttackNum = (int)AttackNumber.Reset;
+                animationProcessedTimer.Begin();
+                presentWeapon.SetActive(false);
+                isAttackKeyReceived = false;
+                isNextAttackRegistered = false;
             }
         }
-        else
+
+        //when fourth attack animation finished
+        if (nextAttackNum == (int)AttackNumber.Reset && animationProcessedTimer.ElapsedTime * 12f > 6f * 1.5f)
         {
-            attackNum = 0;
-            attackCount = 0;
-            onAttackCount = false;
+            presentWeapon.SetActive(false);
+            isAttackKeyReceived = true;
+            finishedAttackNum = (int)AttackNumber.Idle;
+            nextAttackNum = (int)AttackNumber.First;
         }
-
-
-
-
     }
+
+    /// <summary>
+    /// This function is called every fixed framerate frame, if the MonoBehaviour is enabled.
+    /// </summary>
     void FixedUpdate()
     {
-
-        //moveDirectionの値によって速度を設定
-        switch (moveDirection)
+        
+    }
+    
+    enum ChargeStatus : int
+    {
+        Idle = 0,
+        Preparing,
+        Charging,
+        Capturing
+    }
+    ChargeStatus chargeStatus = ChargeStatus.Idle;
+    Timer chargingTimer;
+    public float chargingPreparationTime = 1f;
+    public float chargingTime = 1f;
+    public float animationDuration = 0.8f;
+    void Charge(bool isChargeButtonKeptPressed)
+    {
+        if (isChargeButtonKeptPressed && chargeStatus == ChargeStatus.Idle)
         {
-            case MOVE_DIR.STOP:
-                moveSpeed = 0;
-                break;
-            case MOVE_DIR.LEFT:
-                moveSpeed = MOVE_SPEED * -1;
-                transform.localScale = new Vector2(1, 1);
-                break;
-            case MOVE_DIR.RIGHT:
-                moveSpeed = MOVE_SPEED;
-                transform.localScale = new Vector2(-1, 1);
-                break;
+            chargingTimer.Begin();
+            chargeStatus = ChargeStatus.Preparing;
         }
-        rbody.velocity = new Vector2(moveSpeed, rbody.velocity.y);
-
-        //通常では重力は2
-        rbody.gravityScale = 2f;
-
-        if (Input.GetKey(KeyCode.Space))
+        else if (chargeStatus == ChargeStatus.Preparing)
         {
-            jumpCount++;
-        }
-        else
-        {
-            jumpCount = 0;
-        }
-        //ジャンプボタンを押したときの処理
-        if (stateJump == 0)
-        {
-            if (jumpCount == 1)
+            if (isChargeButtonKeptPressed && chargingTimer.ElapsedTime >= chargingPreparationTime)
             {
-                stateJump = 1;
+                chargingTimer.Begin(true);
+                chargeStatus = ChargeStatus.Charging;
+            }
+            else if (!isChargeButtonKeptPressed && chargingTimer.ElapsedTime < chargingPreparationTime)
+            {
+                chargingTimer.Stop();
+                chargeStatus = ChargeStatus.Idle;
             }
         }
-        else if (stateJump == 2 && jumpCount > 1)
+        else if (chargeStatus == ChargeStatus.Charging)
         {
-            //空中にいて
-            //スペースキーを押しているときは何もしない
-            stateJump = 3;
+            Debug.Log("Charging -- " + chargingTimer.ElapsedTime + "s");
+            if (!isChargeButtonKeptPressed && chargingTimer.ElapsedTime >= chargingTime)
+            {
+                Debug.Log("Attempt to capture");
+                captureBox.SetActive(true);
+                chargingTimer.Begin(true);
+                chargeStatus = ChargeStatus.Capturing;
+
+            }
+            else if (!isChargeButtonKeptPressed && chargingTimer.ElapsedTime < chargingTime)
+            {
+                chargingTimer.Stop();
+                chargeStatus = ChargeStatus.Idle;
+            }
         }
-        else if (stateJump == 3 && jumpCount == 0 && rbody.velocity.y > 0)
+
+        if (chargeStatus == ChargeStatus.Capturing && chargingTimer.ElapsedTime > animationDuration)
         {
-            //空中にいて
-            //スペースキーを離したときは
-            rbody.gravityScale = 5.0f;
-        }
-        else
-        {
-            //何もしない
-        }
-        //ジャンプ処理
-        if (stateJump == 1)
-        {
-            audioSource.PlayOneShot(jumpSE);
-            rbody.AddForce(Vector2.up * jumpPower);
-            stateJump = 2;
+            captureBox.SetActive(false);
+            chargingTimer.Stop();
+            chargeStatus = ChargeStatus.Idle;
         }
     }
 
     //衝突処理
     void OnTriggerEnter2D(Collider2D col)
     {
+
         if (gameManager.GetComponent<GameManager>().gameMode != GameManager.GAME_MODE.PLAY)
         {
             return;
@@ -281,7 +226,7 @@ public class PlayerManager : MonoBehaviour
             {
                 audioSource.PlayOneShot(stampSE);
                 rbody.velocity = new Vector2(rbody.velocity.x, 0);
-                rbody.AddForce(Vector2.up * jumpPower);
+                rbody.AddForce(Vector2.up * 100f);
                 col.gameObject.GetComponent<EnemyManager>().DestroyEnemy();
             }
             else
@@ -317,44 +262,6 @@ public class PlayerManager : MonoBehaviour
         animSet.Append(transform.DOLocalMoveY(1.0f, 0.2f).SetRelative());
         animSet.Append(transform.DOLocalMoveY(-10.0f, 1.0f).SetRelative());
         Destroy(this.gameObject, 1.2f);
-    }
-
-    public void PushLeftButton()
-    {
-        moveDirection = MOVE_DIR.LEFT;
-    }
-
-    public void PushRightButton()
-    {
-        moveDirection = MOVE_DIR.RIGHT;
-    }
-
-    public void ReleaseMoveButton()
-    {
-        moveDirection = MOVE_DIR.STOP;
-
-    }
-    public void PushJumpButton()
-    {
-        if (canJump)
-        {
-            goJump = true;
-
-        }
-    }
-
-    void HitSpaceTime()
-    {
-
-        if (Input.GetKey(KeyCode.Space))
-        {
-            tmpJumpPowerTime += Time.deltaTime;
-        }
-        else
-        {
-            jumpPowerTime = tmpJumpPowerTime;
-        }
-        //ジャンプした現在のフレーム時にjumpPowerTimeとtmpJumpPowerTimeは初期化する
     }
 
 }
