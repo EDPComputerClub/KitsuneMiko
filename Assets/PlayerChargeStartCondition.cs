@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class PlayerChargeStartCondition : Condition
 {
-
-
     ConditionState Status;
     public override ConditionState Check()
     {
@@ -16,6 +14,11 @@ public class PlayerChargeStartCondition : Condition
     void Start()
     {
         Status = new ConditionState();
+        Status.isSatisfied = false;
+    }
+
+    public void Deactivate()
+    {
         Status.isSatisfied = false;
     }
 

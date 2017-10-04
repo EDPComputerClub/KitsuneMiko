@@ -315,7 +315,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: fa99ff5a4bb91624b994af2e3f2f2db0, type: 3}
+  m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -2893,7 +2893,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actionName: ChargeEnd
-  captureBox: {fileID: 0}
+  captureBox: {fileID: 499882806}
   capturingTime: 0.8
 --- !u!114 &908368858
 MonoBehaviour:

@@ -5,47 +5,32 @@ using System.Linq;
 
 public class PlayerChargeStart : Action
 {
-
-    enum ChargeStatus : int
-    {
-        Idle = 0,
-        Preparing,
-        Charging,
-        Capturing
-    }
-    ChargeStatus chargeStatus = ChargeStatus.Idle;
-    Timer chargingTimer;
     public float chargingPreparationTime = 1f;
     public float chargingTime = 1f;
     public float animationDuration = 0.8f;
     public GameObject captureBox;
 
+    // IsDone : true => when Charge ends
+    public bool _IsDone = false;
     public override bool IsDone()
     {
-        return false;
+        return _IsDone;
     }
 
-    /// <summary>
-    /// Start is called on the frame when a script is enabled just before
-    /// any of the Update methods is called the first time.
-    /// </summary>
     void Start()
     {
-        chargingTimer = gameObject.GetComponents<Timer>().First(x => x.timerName == "charging");
         captureBox.SetActive(false);
     }
 
     public override void Act(Dictionary<string, object> args)
     {
-        // TODO: Chargeメソッドの引数をGetKeyとしているのでActionManagerには不適合. GetKeyDown及びGetKeyUpを使うべき
+        _IsDone = false;
         isCharging = true;
         elapsedTime = 0f;
+        gameObject.GetComponent<PlayerChargeStartCondition>().Deactivate();
 
     }
 
-    /// <summary>
-    /// Update is called every frame, if the MonoBehaviour is enabled.
-    /// </summary>
     void Update()
     {
         if (isCharging)
