@@ -2479,6 +2479,8 @@ GameObject:
   - component: {fileID: 908368840}
   - component: {fileID: 908368839}
   - component: {fileID: 908368836}
+  - component: {fileID: 908368858}
+  - component: {fileID: 908368857}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -2585,10 +2587,10 @@ MonoBehaviour:
       not: 0
     weight: 1
     blockActions: []
-  - actionName: Charge
+  - actionName: ChargeStart
     order: 4
     conditions:
-    - conditionName: ChargeCondition
+    - conditionName: ChargeStartCondition
       not: 0
     weight: 1
     blockActions: []
@@ -2596,6 +2598,13 @@ MonoBehaviour:
     order: 5
     conditions:
     - conditionName: JumpDeclineCondition
+      not: 0
+    weight: 1
+    blockActions: []
+  - actionName: ChargeEnd
+    order: 6
+    conditions:
+    - conditionName: ChargeEndCondition
       not: 0
     weight: 1
     blockActions: []
@@ -2788,7 +2797,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   conditionName: AttackCondition
-  countOfAttacking: 0
 --- !u!114 &908368851
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2827,6 +2835,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actionName: Attack
+  sleepTime: 1.5
   purificationStick: {fileID: 1231461724}
 --- !u!114 &908368854
 MonoBehaviour:
@@ -2839,7 +2848,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ff391f0746c1d44d8b176ad043fb43a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  conditionName: ChargeCondition
+  conditionName: ChargeStartCondition
+  preparationTime: 0.8
 --- !u!114 &908368855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2851,7 +2861,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e1f0ba03249fb247988cefe3909b639, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actionName: Charge
+  actionName: ChargeStart
   chargingPreparationTime: 1
   chargingTime: 1
   animationDuration: 0.8
@@ -2871,6 +2881,33 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 256
+--- !u!114 &908368857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 908368835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 132a23466d182b14696ab6c8cb9aa6c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionName: ChargeEnd
+  captureBox: {fileID: 0}
+  capturingTime: 0.8
+--- !u!114 &908368858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 908368835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2821070251f4e9148aebd54b365545d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  conditionName: ChargeEndCondition
+  chargingTime: 1
 --- !u!4 &910119257 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4409745318967056, guid: 6dce2bd20de43a140a0f92777b920077,
