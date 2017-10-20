@@ -1,0 +1,17 @@
+{
+    "actionConfigs": [
+        {
+            "actionName": "RangedAttack",
+            "order": 1,
+            "conditions": [
+                {
+                    "conditionName": "FoundPlayer",
+                    "args": [],
+                    "not": false
+                }
+            ],
+            "weight": 1,
+            "blockActions": ["RangedAttack"]
+        }
+    ]
+}

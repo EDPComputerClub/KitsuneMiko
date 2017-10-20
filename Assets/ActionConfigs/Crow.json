@@ -1,0 +1,24 @@
+{
+    "actionConfigs": [
+        {
+            "actionName": "FlierChase",
+            "order": 0,
+            "conditions": [
+                {
+                    "conditionName": "FoundPlayer",
+                    "args": [],
+                    "not": false
+                }
+            ],
+            "weight": 1,
+            "blockActions": ["FlierStopMove"]
+        },
+        {
+            "actionName": "FlierStopMove",
+            "order": 1,
+            "conditions": [],
+            "weight": 1,
+            "blockActions": []
+        }
+    ]
+}
