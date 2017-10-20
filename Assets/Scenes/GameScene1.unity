@@ -253,12 +253,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 55663470}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bde3e63c80a6aec41860a3ee053f964a, type: 3}
+  m_Script: {fileID: 11500000, guid: 9ecc9367bfbafcf4b9b8dd5220e31dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 908368835}
   outFrameLeft: {fileID: 2105580803}
   outFrameRight: {fileID: 2007845257}
+  outZone: {fileID: 211204191}
 --- !u!4 &82794023 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4409745318967056, guid: 6dce2bd20de43a140a0f92777b920077,
@@ -411,10 +412,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nextStageNum: 2
-  textGameOver: {fileID: 1656066749}
-  textClear: {fileID: 1802999576}
-  textScoreNumber: {fileID: 838379489}
-  gameMode: 0
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 512
   clearSE: {fileID: 8300000, guid: 9910af2cf63f19249a70e7a3c49d3865, type: 3}
   gameoverSE: {fileID: 8300000, guid: d81fb5c8fe6fb194fb105681eee5b1f2, type: 3}
 --- !u!1001 &174564743
@@ -725,6 +725,11 @@ Transform:
   m_PrefabParentObject: {fileID: 4409745318967056, guid: 6dce2bd20de43a140a0f92777b920077,
     type: 2}
   m_PrefabInternal: {fileID: 1327004984}
+--- !u!1 &211204191 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1840928993434228, guid: 9ef9af57e48d6ab4787243cc9a87666d,
+    type: 2}
+  m_PrefabInternal: {fileID: 2011040039}
 --- !u!1001 &221755176
 Prefab:
   m_ObjectHideFlags: 0
@@ -4683,6 +4688,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 114376562824777832, guid: 93b0139dc4146d444870185916ca3585,
+        type: 2}
+      propertyPath: attackOverrideAnimations.Array.size
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 4100218187357138, guid: 93b0139dc4146d444870185916ca3585, type: 2}
       propertyPath: m_LocalPosition.x
       value: -5.7333
@@ -4731,6 +4741,30 @@ Prefab:
       propertyPath: m_GravityScale
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 114376562824777832, guid: 93b0139dc4146d444870185916ca3585,
+        type: 2}
+      propertyPath: attackOverrideAnimations.Array.data[1]
+      value: 
+      objectReference: {fileID: 22100000, guid: 4a2b237a32e97664f9caefd0389b0a61,
+        type: 2}
+    - target: {fileID: 114376562824777832, guid: 93b0139dc4146d444870185916ca3585,
+        type: 2}
+      propertyPath: attackOverrideAnimations.Array.data[2]
+      value: 
+      objectReference: {fileID: 22100000, guid: 3656d6c969b494845b3f717f108b338d,
+        type: 2}
+    - target: {fileID: 114376562824777832, guid: 93b0139dc4146d444870185916ca3585,
+        type: 2}
+      propertyPath: attackOverrideAnimations.Array.data[3]
+      value: 
+      objectReference: {fileID: 22100000, guid: 3656d6c969b494845b3f717f108b338d,
+        type: 2}
+    - target: {fileID: 114376562824777832, guid: 93b0139dc4146d444870185916ca3585,
+        type: 2}
+      propertyPath: attackOverrideAnimations.Array.data[0]
+      value: 
+      objectReference: {fileID: 22100000, guid: afe1ba1c1789e0b4d94354f3c7ec5a4a,
+        type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 93b0139dc4146d444870185916ca3585, type: 2}
   m_IsPrefabParent: 0

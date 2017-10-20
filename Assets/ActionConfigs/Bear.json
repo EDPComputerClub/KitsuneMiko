@@ -1,0 +1,17 @@
+{
+    "actionConfigs": [
+        {
+            "actionName": "MeleeAttack",
+            "order": 0,
+            "conditions": [
+                {
+                    "conditionName": "FoundPlayer",
+                    "args": [],
+                    "not": false
+                }
+            ],
+            "weight": 1,
+            "blockActions": ["MeleeAttack"]
+        }
+    ]
+}

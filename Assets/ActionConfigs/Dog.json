@@ -1,0 +1,37 @@
+{
+    "actionConfigs": [
+        {
+            "actionName": "TurnDirection",
+            "order": 0,
+            "conditions": [
+                {
+                    "conditionName": "BlockExistFront",
+                    "args": [],
+                    "not": false
+                }
+            ],
+            "weight": 1,
+            "blockActions": []
+        },
+        {
+            "actionName": "MoveForward",
+            "order": 1,
+            "conditions": [
+                {
+                    "conditionName": "FoundPlayer",
+                    "args": [],
+                    "not": false
+                }
+            ],
+            "weight": 1,
+            "blockActions": ["StopMove"]
+        },
+        {
+            "actionName": "StopMove",
+            "order": 2,
+            "conditions": [],
+            "weight": 1,
+            "blockActions": []
+        }
+    ]
+}
