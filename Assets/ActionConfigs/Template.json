@@ -1,0 +1,17 @@
+{
+    "actionConfigs": [
+        {
+            "actionName": "",
+            "order": 0,
+            "conditions": [
+                {
+                    "conditionName": "",
+                    "args": [],
+                    "not": false
+                }
+            ],
+            "weight": 1,
+            "blockActions": []
+        }
+    ]
+}
